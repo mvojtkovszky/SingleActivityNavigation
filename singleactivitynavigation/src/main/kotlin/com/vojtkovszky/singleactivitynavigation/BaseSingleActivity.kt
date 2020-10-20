@@ -160,21 +160,30 @@ abstract class BaseSingleActivity: AppCompatActivity() {
 
         // setup transaction
         supportFragmentManager.beginTransaction().apply {
-            // animations
-            when {
-                // root fragment
-                !addToBackStack -> setCustomAnimations(
+            // handle animations. Check if fragment has own defined
+            if (fragment.hasCustomAnimations()) {
+                setCustomAnimations(
+                    fragment.animationEnter, fragment.animationExit,
+                    fragment.animationPopEnter, fragment.animationPopExit)
+            }
+            // or use global settings otherwise
+            else {
+                when {
+                    // root fragment
+                    !addToBackStack -> setCustomAnimations(
                         customAnimationSettings.animationRootEnter, customAnimationSettings.animationRootExit,
                         customAnimationSettings.animationRootPopEnter, customAnimationSettings.animationRootPopExit)
-                // modal
-                fragment.isModal -> setCustomAnimations(
+                    // modal
+                    fragment.isModal -> setCustomAnimations(
                         customAnimationSettings.animationModalEnter, customAnimationSettings.animationModalExit,
                         customAnimationSettings.animationModalPopEnter, customAnimationSettings.animationModalPopExit)
-                // default secondary
-                else -> setCustomAnimations(
+                    // default secondary
+                    else -> setCustomAnimations(
                         customAnimationSettings.animationSecondaryEnter, customAnimationSettings.animationSecondaryExit,
                         customAnimationSettings.animationSecondaryPopEnter, customAnimationSettings.animationSecondaryPopExit)
+                }
             }
+
             // back stack add always, except on root views (when switching bottom tabs)
             if (addToBackStack) {
                 addToBackStack(fragment::class.simpleName)

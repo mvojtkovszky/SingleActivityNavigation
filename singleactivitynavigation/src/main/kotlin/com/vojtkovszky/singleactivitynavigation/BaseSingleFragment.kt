@@ -2,9 +2,11 @@ package com.vojtkovszky.singleactivitynavigation
 
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.AnimRes
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 
+@Suppress("unused")
 abstract class BaseSingleFragment: Fragment() {
     /**
      * Determine if a fragment is a modal.
@@ -32,6 +34,38 @@ abstract class BaseSingleFragment: Fragment() {
      */
     @SuppressWarnings("WeakerAccess")
     val baseSingleActivity: BaseSingleActivity = requireActivity() as BaseSingleActivity
+
+    // region animations
+    /**
+     * Default enter animation. If none defined, [BaseSingleActivity.customAnimationSettings] is used
+     */
+    @AnimRes
+    open val animationEnter = 0
+
+    /**
+     * Default exit animation. If none defined, [BaseSingleActivity.customAnimationSettings] is used
+     */
+    @AnimRes
+    open val animationExit = 0
+
+    /**
+     * Default pop enter animation. If none defined, [BaseSingleActivity.customAnimationSettings] is used
+     */
+    @AnimRes
+    open val animationPopEnter = 0
+
+    /**
+     * Default pop exit animation. If none defined, [BaseSingleActivity.customAnimationSettings] is used
+     */
+    @AnimRes
+    open val animationPopExit = 0
+
+    /**
+     * True if at least one animation resource is set
+     */
+    fun hasCustomAnimations(): Boolean =
+            animationEnter != 0 || animationExit != 0 || animationPopEnter != 0 || animationPopExit != 0
+    // endregion animations
 
     // region shortcuts to baseSingleActivity methods
     /**
