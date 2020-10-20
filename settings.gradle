@@ -1,0 +1,2 @@
+include ':singleactivitynavigation'
+rootProject.name = "SingleActivityNavigation"
