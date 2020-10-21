@@ -1,7 +1,7 @@
 # SingleActivityNavigation
 A simple single activity application framework with straightforward navigation controlls, allowing
 to reuse fragments and move between them as root views, dialogs, bottom sheets, modals etc. with minimal dependencies.
-<br/>
+<br/><br/>
 <img src="example.gif" alt="Example Flow" width="320"/>
 
 ## How does it work?
