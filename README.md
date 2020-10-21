@@ -1,14 +1,12 @@
 # SingleActivityNavigation
 A simple single activity application framework with straightforward navigation controlls, allowing
 to reuse fragments and move between them as root views, dialogs, bottom sheets, modals etc. with minimal dependencies.
+<br/>
+<img src="example.gif" alt="Example Flow" width="320"/>
 
 ## How does it work?
 Your single activity must extend from BaseSingleActivity and all your fragments extend from BaseSingleFragment.
 Then you can simply move between your fragments by using public methods in your activity or fragment.
-
-<br/>
-<img src="example.gif" alt="Example Flow" width="360"/>
-<br/>
 
 ``` kotlin
 // take any fragment of your choosing
