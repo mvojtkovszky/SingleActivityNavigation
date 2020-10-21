@@ -76,24 +76,35 @@ abstract class BaseSingleFragment: Fragment() {
     }
 
     /**
-     * Shortcut to [BaseSingleActivity.navigateBackToRoot]
+     * Shortcut to [BaseSingleActivity.navigateBackToFragment]
      */
-    fun navigateBackToRoot() {
-        baseSingleActivity.navigateBackToRoot()
+    fun navigateBack(backIfBackStackEmpty: Boolean = true) {
+        baseSingleActivity.navigateBack(backIfBackStackEmpty)
     }
 
     /**
-     * Shortcut to [BaseSingleActivity.selectMainFragment]
+     * Shortcut to [BaseSingleActivity.navigateBackToRoot]
      */
-    fun selectMainFragment(positionIndex: Int) {
-        baseSingleActivity.selectMainFragment(positionIndex)
+    fun navigateBackToRoot(closeDialogsAndSheets: Boolean = true) {
+        baseSingleActivity.navigateBackToRoot(closeDialogsAndSheets)
+    }
+
+    /**
+     * Shortcut to [BaseSingleActivity.selectRootFragment]
+     */
+    fun selectRootFragment(positionIndex: Int = 0,
+                           popStack: Boolean = true,
+                           closeDialogsAndSheets: Boolean = true) {
+        baseSingleActivity.selectRootFragment(positionIndex, popStack, closeDialogsAndSheets)
     }
 
     /**
      * Shortcut to [BaseSingleActivity.navigateTo]
      */
-    fun navigateTo(fragment: BaseSingleFragment, ignoreIfAlreadyInStack: Boolean = false) {
-        baseSingleActivity.navigateTo(fragment, ignoreIfAlreadyInStack)
+    fun navigateTo(fragment: BaseSingleFragment,
+                   ignoreIfAlreadyInStack: Boolean = false,
+                   closeDialogsAndSheets: Boolean = true) {
+        baseSingleActivity.navigateTo(fragment, ignoreIfAlreadyInStack, closeDialogsAndSheets)
     }
 
     /**

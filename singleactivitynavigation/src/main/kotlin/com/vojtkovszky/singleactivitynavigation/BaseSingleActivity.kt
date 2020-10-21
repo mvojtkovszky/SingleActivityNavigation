@@ -39,18 +39,18 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     val customAnimationSettings = CustomAnimationSettings()
 
     /**
-     * used to hold references to root fragments retrieved from [getNewMainFragmentInstance], which
-     * itself is invoked when [selectMainFragment] is called
+     * used to hold references to root fragments retrieved from [getNewRootFragmentInstance], which
+     * itself is invoked when [selectRootFragment] is called
      */
     private val rootFragments = mutableListOf<BaseSingleFragment?>()
 
     /**
      * Extending activity is required to define at least one main (root) Fragment,
-     * which will not be added to the back stack and will be selected using [selectMainFragment] method.
+     * which will not be added to the back stack and will be selected using [selectRootFragment] method.
      *
      * If you have only one such fragment, simply ignore [positionIndex] as it will always be 0.
      */
-    abstract fun getNewMainFragmentInstance(positionIndex: Int): BaseSingleFragment?
+    abstract fun getNewRootFragmentInstance(positionIndex: Int): BaseSingleFragment?
 
     /**
      * This function will be invoked whenever back stack count changes, indicating change
@@ -83,14 +83,27 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     }
 
     /**
+     * Navigate one step back on the back stack.
+     * If you happen to be on root screen and back stack is empty, a back call will be used,
+     * effectively closing the app. To prevent this, use false for [backIfBackStackEmpty] parameter.
+     */
+    fun navigateBack(backIfBackStackEmpty: Boolean = true) {
+        if (backIfBackStackEmpty && supportFragmentManager.backStackEntryCount == 0) {
+            onBackPressed()
+        } else {
+            supportFragmentManager.popBackStack()
+        }
+    }
+
+    /**
      * Will select [rootFragments] on [positionIndex].
      * Calling this while secondary fragment in in front will first pop whole stack.
      *
-     * @param positionIndex corresponding with fragment supplied with [getNewMainFragmentInstance]
+     * @param positionIndex corresponding with fragment supplied with [getNewRootFragmentInstance]
      * @param popStack pop whole stack beneath new main fragment
      * @param closeDialogsAndSheets if any dialogs and bottom sheets are open, close those before transaction.
      */
-    fun selectMainFragment(positionIndex: Int = 0,
+    fun selectRootFragment(positionIndex: Int = 0,
                            popStack: Boolean = true,
                            closeDialogsAndSheets: Boolean = true) {
         handleCloseAllDialogsAndSheets(closeDialogsAndSheets)
@@ -100,7 +113,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         }
 
         if (rootFragments[positionIndex] == null) {
-            rootFragments[positionIndex] = getNewMainFragmentInstance(positionIndex)
+            rootFragments[positionIndex] = getNewRootFragmentInstance(positionIndex)
         }
 
         rootFragments[positionIndex]?.let {
@@ -225,10 +238,10 @@ abstract class BaseSingleActivity: AppCompatActivity() {
                     fragment.isModal -> setCustomAnimations(
                         customAnimationSettings.animationModalEnter, customAnimationSettings.animationModalExit,
                         customAnimationSettings.animationModalPopEnter, customAnimationSettings.animationModalPopExit)
-                    // default secondary
+                    // default
                     else -> setCustomAnimations(
-                        customAnimationSettings.animationSecondaryEnter, customAnimationSettings.animationSecondaryExit,
-                        customAnimationSettings.animationSecondaryPopEnter, customAnimationSettings.animationSecondaryPopExit)
+                        customAnimationSettings.animationDefaultEnter, customAnimationSettings.animationDefaultExit,
+                        customAnimationSettings.animationDefaultPopEnter, customAnimationSettings.animationDefaultPopExit)
                 }
             }
 

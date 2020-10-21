@@ -9,7 +9,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : BaseSingleActivity() {
 
     // define main fragments based on position
-    override fun getNewMainFragmentInstance(positionIndex: Int): BaseSingleFragment? {
+    override fun getNewRootFragmentInstance(positionIndex: Int): BaseSingleFragment? {
         return when (positionIndex) {
             0 -> MainFragment.newInstance(getString(R.string.title_home), isRoot = true)
             1 -> MainFragment.newInstance(getString(R.string.title_dashboard), isRoot = true)
@@ -28,9 +28,9 @@ class MainActivity : BaseSingleActivity() {
         // we'll be switching main fragments with out bottom navigation
         navigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.navigation_home -> selectMainFragment(0)
-                R.id.navigation_dashboard -> selectMainFragment(1)
-                R.id.navigation_notifications -> selectMainFragment(2)
+                R.id.navigation_home -> selectRootFragment(0)
+                R.id.navigation_dashboard -> selectRootFragment(1)
+                R.id.navigation_notifications -> selectRootFragment(2)
                 else -> return@setOnNavigationItemSelectedListener false
             }
             return@setOnNavigationItemSelectedListener true
@@ -42,12 +42,12 @@ class MainActivity : BaseSingleActivity() {
         customAnimationSettings.setCustomAnimationsModal(
             R.anim.enter_from_bottom, R.anim.exit_to_top_short,
             R.anim.enter_from_top_short, R.anim.exit_to_bottom)
-        customAnimationSettings.setCustomAnimationsSecondary(
+        customAnimationSettings.setCustomAnimationsDefault(
             R.anim.enter_from_right, R.anim.exit_to_left_short,
             R.anim.enter_from_left_short, R.anim.exit_to_right)
 
         // select default fragment on tab 1
-        selectMainFragment(0)
+        selectRootFragment()
     }
 
     override fun onBackStackChanged(backStackCount: Int) {

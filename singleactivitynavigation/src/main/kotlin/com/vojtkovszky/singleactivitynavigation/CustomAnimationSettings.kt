@@ -20,10 +20,10 @@ class CustomAnimationSettings {
     @AnimRes var animationModalExit = 0
     @AnimRes var animationModalPopEnter = 0
     @AnimRes var animationModalPopExit = 0
-    @AnimRes var animationSecondaryEnter = 0
-    @AnimRes var animationSecondaryExit = 0
-    @AnimRes var animationSecondaryPopEnter = 0
-    @AnimRes var animationSecondaryPopExit = 0
+    @AnimRes var animationDefaultEnter = 0
+    @AnimRes var animationDefaultExit = 0
+    @AnimRes var animationDefaultPopEnter = 0
+    @AnimRes var animationDefaultPopExit = 0
 
     /**
      * Set custom animation resources for root fragments transactions.
@@ -54,13 +54,13 @@ class CustomAnimationSettings {
     /**
      * Set custom animation resources for secondary fragments transactions.
      */
-    fun setCustomAnimationsSecondary(@AnimRes enter: Int = 0,
-                                     @AnimRes exit: Int = 0,
-                                     @AnimRes popEnter: Int = 0,
-                                     @AnimRes popExit: Int = 0) {
-        this.animationSecondaryEnter = enter
-        this.animationSecondaryExit = exit
-        this.animationSecondaryPopEnter = popEnter
-        this.animationSecondaryPopExit = popExit
+    fun setCustomAnimationsDefault(@AnimRes enter: Int = 0,
+                                   @AnimRes exit: Int = 0,
+                                   @AnimRes popEnter: Int = 0, 
+                                   @AnimRes popExit: Int = 0) {
+        this.animationDefaultEnter = enter
+        this.animationDefaultExit = exit
+        this.animationDefaultPopEnter = popEnter
+        this.animationDefaultPopExit = popExit
     }
 }
