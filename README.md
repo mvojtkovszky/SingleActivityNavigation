@@ -4,7 +4,9 @@ to reuse fragments and move between them as root views, dialogs, bottom sheets, 
 
 ## How does it work?
 Your single activity must extend from BaseSingleActivity and all your fragments extend from BaseSingleFragment.
-Then you can simply move between your fragments by using public methods in your activity or fragment
+Then you can simply move between your fragments by using public methods in your activity or fragment.
+
+![Alt text](example.gif "Example flow")
 
 ``` kotlin
 // take any fragment of your choosing
