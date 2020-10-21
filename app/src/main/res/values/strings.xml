@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">SingleActivityNavigationExample</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="open_new_modal_fragment">Open Modal Fragment</string>
+    <string name="open_new_regular_fragment">Open Regular Fragment</string>
+    <string name="open_bottom_sheet">Open Bottom Sheet Fragment</string>
+    <string name="open_dialog">Open Dialog Fragment</string>
+    <string name="back_to_root">Go Back To Root</string>
+</resources>

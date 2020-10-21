@@ -2,15 +2,17 @@ package com.vojtkovszky.singleactivitynavigation
 
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.AnimRes
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 
+@Suppress("unused")
 abstract class BaseSingleFragment: Fragment() {
     /**
      * Determine if a fragment is a modal.
      * That usually effects the animation behaviour.
      */
-    open val isModal: Boolean = false
+    open var isModal: Boolean = false
 
     /**
      * Indicates if this fragment is contained in a bottom sheet
@@ -30,8 +32,40 @@ abstract class BaseSingleFragment: Fragment() {
     /**
      * Reference to activity holding this fragment
      */
-    @SuppressWarnings("WeakerAccess")
-    val baseSingleActivity: BaseSingleActivity = requireActivity() as BaseSingleActivity
+    val baseSingleActivity: BaseSingleActivity
+        get() = requireActivity() as BaseSingleActivity
+
+    // region animations
+    /**
+     * Default enter animation. If none defined, [BaseSingleActivity.customAnimationSettings] is used
+     */
+    @AnimRes
+    open val animationEnter = 0
+
+    /**
+     * Default exit animation. If none defined, [BaseSingleActivity.customAnimationSettings] is used
+     */
+    @AnimRes
+    open val animationExit = 0
+
+    /**
+     * Default pop enter animation. If none defined, [BaseSingleActivity.customAnimationSettings] is used
+     */
+    @AnimRes
+    open val animationPopEnter = 0
+
+    /**
+     * Default pop exit animation. If none defined, [BaseSingleActivity.customAnimationSettings] is used
+     */
+    @AnimRes
+    open val animationPopExit = 0
+
+    /**
+     * True if at least one animation resource is set
+     */
+    fun hasCustomAnimations(): Boolean =
+            animationEnter != 0 || animationExit != 0 || animationPopEnter != 0 || animationPopExit != 0
+    // endregion animations
 
     // region shortcuts to baseSingleActivity methods
     /**
@@ -42,24 +76,35 @@ abstract class BaseSingleFragment: Fragment() {
     }
 
     /**
-     * Shortcut to [BaseSingleActivity.navigateBackToRoot]
+     * Shortcut to [BaseSingleActivity.navigateBackToFragment]
      */
-    fun navigateBackToRoot() {
-        baseSingleActivity.navigateBackToRoot()
+    fun navigateBack(backIfBackStackEmpty: Boolean = true) {
+        baseSingleActivity.navigateBack(backIfBackStackEmpty)
     }
 
     /**
-     * Shortcut to [BaseSingleActivity.selectMainFragment]
+     * Shortcut to [BaseSingleActivity.navigateBackToRoot]
      */
-    fun selectMainFragment(positionIndex: Int) {
-        baseSingleActivity.selectMainFragment(positionIndex)
+    fun navigateBackToRoot(closeDialogsAndSheets: Boolean = true) {
+        baseSingleActivity.navigateBackToRoot(closeDialogsAndSheets)
+    }
+
+    /**
+     * Shortcut to [BaseSingleActivity.selectRootFragment]
+     */
+    fun selectRootFragment(positionIndex: Int = 0,
+                           popStack: Boolean = true,
+                           closeDialogsAndSheets: Boolean = true) {
+        baseSingleActivity.selectRootFragment(positionIndex, popStack, closeDialogsAndSheets)
     }
 
     /**
      * Shortcut to [BaseSingleActivity.navigateTo]
      */
-    fun navigateTo(fragment: BaseSingleFragment, ignoreIfAlreadyInStack: Boolean = false) {
-        baseSingleActivity.navigateTo(fragment, ignoreIfAlreadyInStack)
+    fun navigateTo(fragment: BaseSingleFragment,
+                   ignoreIfAlreadyInStack: Boolean = false,
+                   closeDialogsAndSheets: Boolean = true) {
+        baseSingleActivity.navigateTo(fragment, ignoreIfAlreadyInStack, closeDialogsAndSheets)
     }
 
     /**

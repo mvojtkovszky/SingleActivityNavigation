@@ -19,7 +19,6 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.vojtkovszky.singleactivitynavigation"
         minSdkVersion 17
         targetSdkVersion 30
         versionCode 1
@@ -51,7 +50,7 @@ project.afterEvaluate {
         publications {
             library(MavenPublication) {
                 groupId = 'com.github.mvojtkovszky'
-                artifactId = 'BillingHelper'
+                artifactId = 'SingleActivityNavigation'
                 version = android.defaultConfig.versionName
                 artifact bundleDebugAar
                 // make sure pom has all dependencies
