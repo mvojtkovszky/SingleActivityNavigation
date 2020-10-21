@@ -7,7 +7,7 @@ Your single activity must extend from BaseSingleActivity and all your fragments 
 Then you can simply move between your fragments by using public methods in your activity or fragment.
 
 <br/>
-<img src="drawing.jpg" alt="drawing" width="360"/>
+<img src="example.gif" alt="Example Flow" width="360"/>
 <br/>
 
 ``` kotlin
