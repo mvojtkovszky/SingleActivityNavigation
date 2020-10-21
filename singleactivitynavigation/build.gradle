@@ -50,7 +50,7 @@ project.afterEvaluate {
         publications {
             library(MavenPublication) {
                 groupId = 'com.github.mvojtkovszky'
-                artifactId = 'SingleActivityNavigatios'
+                artifactId = 'SingleActivityNavigation'
                 version = android.defaultConfig.versionName
                 artifact bundleDebugAar
                 // make sure pom has all dependencies

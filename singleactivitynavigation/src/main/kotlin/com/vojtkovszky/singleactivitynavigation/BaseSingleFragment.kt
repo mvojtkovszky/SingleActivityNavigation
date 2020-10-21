@@ -12,7 +12,7 @@ abstract class BaseSingleFragment: Fragment() {
      * Determine if a fragment is a modal.
      * That usually effects the animation behaviour.
      */
-    open val isModal: Boolean = false
+    open var isModal: Boolean = false
 
     /**
      * Indicates if this fragment is contained in a bottom sheet
@@ -32,8 +32,8 @@ abstract class BaseSingleFragment: Fragment() {
     /**
      * Reference to activity holding this fragment
      */
-    @SuppressWarnings("WeakerAccess")
-    val baseSingleActivity: BaseSingleActivity = requireActivity() as BaseSingleActivity
+    val baseSingleActivity: BaseSingleActivity
+        get() = requireActivity() as BaseSingleActivity
 
     // region animations
     /**
