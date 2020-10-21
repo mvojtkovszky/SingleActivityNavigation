@@ -1,4 +1,4 @@
-# DrawingView
+# SingleActivityNavigation
 A simple single activity application framework with straightforward navigation controlls, allowing
 to reuse fragments and move between them as root views, dialogs, bottom sheets, modals etc. with minimal dependencies.
 
