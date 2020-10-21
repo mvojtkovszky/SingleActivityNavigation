@@ -6,7 +6,9 @@ to reuse fragments and move between them as root views, dialogs, bottom sheets, 
 Your single activity must extend from BaseSingleActivity and all your fragments extend from BaseSingleFragment.
 Then you can simply move between your fragments by using public methods in your activity or fragment.
 
-![Alt text](example.gif =360x)
+<br/>
+<img src="drawing.jpg" alt="drawing" width="360"/>
+<br/>
 
 ``` kotlin
 // take any fragment of your choosing
