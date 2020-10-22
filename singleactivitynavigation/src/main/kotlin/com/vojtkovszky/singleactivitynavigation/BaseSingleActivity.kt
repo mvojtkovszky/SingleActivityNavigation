@@ -19,6 +19,14 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     val currentSecondaryFragment: BaseSingleFragment?
         get() = supportFragmentManager.fragments.filterIsInstance<BaseSingleFragment>().lastOrNull()
 
+
+    /**
+     * A modifier allowing to set behaviour while navigating through fragments
+     * Setting this to true (default) will mean that on every navigation change, any currently opened
+     * dialogs and bottom sheet will be closed, while false will keep those open.
+     */
+    var closeDialogsAndSheetsWhileNavigating: Boolean = true
+
     /**
      * Represents a currently opened dialog fragment or null if dialog is not opened.
      */
@@ -62,10 +70,11 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     /**
      * pop until the fragment with given [fragmentName] is found, or all the way back to root
      */
-    fun navigateBackToFragment(fragmentName: String) {
+    fun navigateBackTo(fragmentName: String) {
+        handleCloseAllDialogsAndSheets()
         supportFragmentManager.let {
             for (i in it.backStackEntryCount - 1 downTo 0) {
-                if (supportFragmentManager.getBackStackEntryAt(i).name == fragmentName) {
+                if (it.getBackStackEntryAt(i).name == fragmentName) {
                     return
                 }
                 it.popBackStack()
@@ -77,22 +86,15 @@ abstract class BaseSingleActivity: AppCompatActivity() {
      * Pop all the way back to main fragment
      */
     @SuppressWarnings("WeakerAccess")
-    fun navigateBackToRoot(closeDialogsAndSheets: Boolean = true) {
-        handleCloseAllDialogsAndSheets(closeDialogsAndSheets)
-        navigateBackToFragment("")
+    fun navigateBackToRoot() {
+        navigateBackTo("")
     }
 
     /**
-     * Navigate one step back on the back stack.
-     * If you happen to be on root screen and back stack is empty, a back call will be used,
-     * effectively closing the app. To prevent this, use false for [backIfBackStackEmpty] parameter.
+     * Navigate one step back, effectively triggering a back press.
      */
-    fun navigateBack(backIfBackStackEmpty: Boolean = true) {
-        if (backIfBackStackEmpty && supportFragmentManager.backStackEntryCount == 0) {
-            onBackPressed()
-        } else {
-            supportFragmentManager.popBackStack()
-        }
+    fun navigateBack() {
+        onBackPressed()
     }
 
     /**
@@ -100,20 +102,19 @@ abstract class BaseSingleActivity: AppCompatActivity() {
      * Calling this while secondary fragment in in front will first pop whole stack.
      *
      * @param positionIndex corresponding with fragment supplied with [getNewRootFragmentInstance]
-     * @param popStack pop whole stack beneath new main fragment
-     * @param closeDialogsAndSheets if any dialogs and bottom sheets are open, close those before transaction.
+     * @param popStack pop whole stack above selected main fragment
      */
-    fun selectRootFragment(positionIndex: Int = 0,
-                           popStack: Boolean = true,
-                           closeDialogsAndSheets: Boolean = true) {
-        handleCloseAllDialogsAndSheets(closeDialogsAndSheets)
+    fun selectRootFragment(positionIndex: Int = 0, popStack: Boolean = true) {
+        handleCloseAllDialogsAndSheets()
 
         while (rootFragments.lastIndex < positionIndex) {
             rootFragments.add(null)
         }
 
         if (rootFragments[positionIndex] == null) {
-            rootFragments[positionIndex] = getNewRootFragmentInstance(positionIndex)
+            rootFragments[positionIndex] = getNewRootFragmentInstance(positionIndex)?.also {
+                it.fragmentType = FragmentType.ROOT
+            }
         }
 
         rootFragments[positionIndex]?.let {
@@ -127,13 +128,13 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     /**
      * Navigate to a fragment which will be added to the top of back stack as a secondary fragment
      * @param fragment fragment to navigate to
+     * @param openAsModal
      * @param ignoreIfAlreadyInStack if same type of fragment already exists in back stack, transaction will be ignored.
-     * @param closeDialogsAndSheets if any dialogs and bottom sheets are open, close those before transaction.
      */
     fun navigateTo(fragment: BaseSingleFragment,
-                   ignoreIfAlreadyInStack: Boolean = false,
-                   closeDialogsAndSheets: Boolean = true) {
-        handleCloseAllDialogsAndSheets(closeDialogsAndSheets)
+                   openAsModal: Boolean = false,
+                   ignoreIfAlreadyInStack: Boolean = false) {
+        handleCloseAllDialogsAndSheets()
 
         if (ignoreIfAlreadyInStack) {
             for (fragmentInStack in supportFragmentManager.fragments) {
@@ -143,6 +144,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
             }
         }
 
+        fragment.fragmentType = if (openAsModal) FragmentType.MODAL else FragmentType.DEFAULT
         commitTransaction(fragment, true)
     }
 
@@ -154,7 +156,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         with(BaseSingleBottomSheetFragment()) {
             currentBottomSheetFragment = this
             this.fragment = fragment
-            this.fragment.isInBottomSheet = true
+            this.fragment.fragmentType = FragmentType.BOTTOM_SHEET
             this.show(supportFragmentManager, fragment::class.simpleName)
         }
     }
@@ -168,7 +170,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         with(BaseSingleDialogFragment.newInstance(anchorView)) {
             currentDialogFragment = this
             this.fragment = fragment
-            this.fragment.isInDialog = true
+            this.fragment.fragmentType = FragmentType.DIALOG
             this.show(supportFragmentManager, fragment::class.simpleName)
         }
     }
@@ -229,13 +231,13 @@ abstract class BaseSingleActivity: AppCompatActivity() {
             }
             // or use global settings otherwise
             else {
-                when {
+                when (fragment.fragmentType) {
                     // root fragment
-                    !addToBackStack -> setCustomAnimations(
+                    FragmentType.ROOT -> setCustomAnimations(
                         customAnimationSettings.animationRootEnter, customAnimationSettings.animationRootExit,
                         customAnimationSettings.animationRootPopEnter, customAnimationSettings.animationRootPopExit)
                     // modal
-                    fragment.isModal -> setCustomAnimations(
+                    FragmentType.MODAL -> setCustomAnimations(
                         customAnimationSettings.animationModalEnter, customAnimationSettings.animationModalExit,
                         customAnimationSettings.animationModalPopEnter, customAnimationSettings.animationModalPopExit)
                     // default
@@ -256,8 +258,8 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         }
     }
 
-    private fun handleCloseAllDialogsAndSheets(close: Boolean) {
-        if (close) {
+    private fun handleCloseAllDialogsAndSheets() {
+        if (closeDialogsAndSheetsWhileNavigating) {
             closeCurrentlyOpenBottomSheet()
             closeCurrentlyOpenDialog()
         }
