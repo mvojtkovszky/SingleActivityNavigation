@@ -25,35 +25,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="@string/open_new_regular_fragment"/>
-
+            tools:text="@string/open_type_fragment"/>
         <Button
             android:id="@+id/buttonOpenModal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="@string/open_new_modal_fragment"/>
-
+            tools:text="@string/open_type_fragment"/>
         <Button
             android:id="@+id/buttonOpenBottomSheet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="@string/open_bottom_sheet"/>
-
+            tools:text="@string/open_type_fragment"/>
         <Button
             android:id="@+id/buttonOpenDialog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
-            android:text="@string/open_dialog"/>
+            tools:text="@string/open_type_fragment"/>
 
         <Button
             android:id="@+id/buttonBackToRoot"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/back_to_root"/>
-
+            tools:text="@string/back_to_root"/>
     </LinearLayout>
 
 </ScrollView>

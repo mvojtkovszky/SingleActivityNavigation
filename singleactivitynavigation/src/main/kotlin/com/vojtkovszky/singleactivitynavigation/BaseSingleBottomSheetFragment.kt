@@ -8,14 +8,19 @@ import android.widget.FrameLayout
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class BaseSingleBottomSheetFragment: BottomSheetDialogFragment() {
+/**
+ * A bottom sheet fragment acting as a container for our [BaseSingleFragment], created when
+ * [BaseSingleActivity.openBottomSheet] is called.
+ */
+internal class BaseSingleBottomSheetFragment: BottomSheetDialogFragment() {
 
+    // fragment is to be set before dialog is created.
+    // It will be attached to dialog's base view when the dialog is created.
     lateinit var fragment: BaseSingleFragment
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return FrameLayout(requireActivity()).apply {
             id = R.id.bottomSheetFragment
-            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
             childFragmentManager
                 .beginTransaction()
                 .replace(R.id.bottomSheetFragment, fragment, fragment::class.simpleName)
@@ -25,6 +30,8 @@ class BaseSingleBottomSheetFragment: BottomSheetDialogFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        // remove fragment from view when dialog's view is getting destroyed
         if (::fragment.isInitialized) {
             childFragmentManager
                     .beginTransaction()
@@ -34,7 +41,7 @@ class BaseSingleBottomSheetFragment: BottomSheetDialogFragment() {
     }
 
     override fun show(manager: FragmentManager, tag: String?) {
-        check(::fragment.isInitialized) {
+        require(::fragment.isInitialized) {
             "Fragment needs to be set before calling show"
         }
         super.show(manager, tag)

@@ -3,9 +3,13 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
-    <string name="open_new_modal_fragment">Open Modal Fragment</string>
-    <string name="open_new_regular_fragment">Open Regular Fragment</string>
-    <string name="open_bottom_sheet">Open Bottom Sheet Fragment</string>
-    <string name="open_dialog">Open Dialog Fragment</string>
-    <string name="back_to_root">Go Back To Root</string>
+
+    <string name="type_root">Root</string>
+    <string name="type_regular">Regular</string>
+    <string name="type_modal">Modal</string>
+    <string name="type_bottom_sheet">Bottom Sheet</string>
+    <string name="type_dialog">Dialog</string>
+    <string name="back_to_root">Back To Root</string>
+    <string name="open_type_fragment">Open %s Fragment</string>
+    <string name="this_is_type_fragment">This is %s Fragment</string>
 </resources>

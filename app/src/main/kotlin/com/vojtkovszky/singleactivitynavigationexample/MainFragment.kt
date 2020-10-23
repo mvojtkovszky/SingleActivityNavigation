@@ -5,34 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.vojtkovszky.singleactivitynavigation.BaseSingleFragment
+import com.vojtkovszky.singleactivitynavigation.FragmentType
 import kotlinx.android.synthetic.main.fragment_main.*
 
 class MainFragment : BaseSingleFragment() {
-
-    companion object {
-        private const val PARAM_FRAGMENT_NAME = "MainFragment.PARAM_FRAGMENT_NAME"
-        private const val PARAM_IS_ROOT = "MainFragment.PARAM_IS_MODAL"
-
-        fun newInstance(title: String, isModal: Boolean = false, isRoot: Boolean = false) =
-            MainFragment().apply {
-                arguments = Bundle().apply {
-                    putString(PARAM_FRAGMENT_NAME, title)
-                    putBoolean(PARAM_IS_ROOT, isRoot)
-                }
-                this.isModal = isModal
-            }
-    }
-
-    private var title: String? = null
-    private var isRoot: Boolean = false
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            title = it.getString(PARAM_FRAGMENT_NAME)
-            isRoot = it.getBoolean(PARAM_IS_ROOT)
-        }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_main, container, false)
@@ -41,36 +17,42 @@ class MainFragment : BaseSingleFragment() {
     override fun onResume() {
         super.onResume()
 
-        if (!isInBottomSheet) {
+        // Set title. Determine type of current fragment with fragmentType parameter
+        val title = getString(when(fragmentType) {
+            FragmentType.BOTTOM_SHEET -> R.string.type_bottom_sheet
+            FragmentType.DIALOG -> R.string.type_dialog
+            FragmentType.ROOT -> R.string.type_root
+            FragmentType.MODAL -> R.string.type_modal
+            FragmentType.DEFAULT -> R.string.type_regular
+        })
+
+        // use it to set status text
+        textStatus.text = getString(R.string.this_is_type_fragment, title)
+        // and change title, but not needed in dialog
+        if (!fragmentType.isDialogOrBottomSheet()) {
             baseSingleActivity.supportActionBar?.title = title
         }
 
-        buttonOpenRegular.setOnClickListener {
-            navigateTo(newInstance("Regular"))
+        // click listeners on buttons
+        buttonOpenRegular.let {
+            it.text = getString(R.string.open_type_fragment, getString(R.string.type_regular))
+            it.setOnClickListener { navigateTo(MainFragment()) }
         }
-
-        buttonOpenModal.setOnClickListener {
-            navigateTo(newInstance("Modal", isModal = true))
+        buttonOpenModal.let {
+            it.text = getString(R.string.open_type_fragment, getString(R.string.type_modal))
+            it.setOnClickListener { navigateTo(MainFragment(), openAsModal = true) }
         }
-
-        buttonOpenBottomSheet.setOnClickListener {
-            openBottomSheet(newInstance("Bottom Sheet"))
+        buttonOpenBottomSheet.let {
+            it.text = getString(R.string.open_type_fragment, getString(R.string.type_bottom_sheet))
+            it.setOnClickListener { openBottomSheet(MainFragment()) }
         }
-
-        buttonOpenDialog.setOnClickListener {
-            openDialog(newInstance("Dialog"))
+        buttonOpenDialog.let {
+            it.text = getString(R.string.open_type_fragment, getString(R.string.type_dialog))
+            it.setOnClickListener { openDialog(MainFragment())}
         }
-
-        buttonBackToRoot.setOnClickListener {
-            navigateBackToRoot()
-        }
-
-        textStatus.text = when {
-            isInBottomSheet -> "This is a bottom sheet"
-            isInDialog -> "This is a dialog"
-            isRoot -> "This is a root fragment"
-            isModal -> "This is a modal fragment"
-            else -> "This is a regular fragment"
+        buttonBackToRoot.let {
+            it.text = getString(R.string.back_to_root)
+            it.setOnClickListener { navigateBackToRoot() }
         }
     }
 }

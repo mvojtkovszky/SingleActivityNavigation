@@ -90,8 +90,9 @@ abstract class BaseSingleFragment: Fragment() {
     /**
      * Shortcut to [BaseSingleActivity.navigateTo]
      */
-    fun navigateTo(fragment: BaseSingleFragment, ignoreIfAlreadyInStack: Boolean = false) {
-        baseSingleActivity.navigateTo(fragment, ignoreIfAlreadyInStack)
+    fun navigateTo(fragment: BaseSingleFragment, openAsModal: Boolean = false,
+                   ignoreIfAlreadyInStack: Boolean = false) {
+        baseSingleActivity.navigateTo(fragment, openAsModal, ignoreIfAlreadyInStack)
     }
 
     /**
@@ -104,8 +105,8 @@ abstract class BaseSingleFragment: Fragment() {
     /**
      * Shortcut to [BaseSingleActivity.openDialog]
      */
-    fun openDialog(fragment: BaseSingleFragment, anchorView: View? = null) {
-        baseSingleActivity.openDialog(fragment, anchorView)
+    fun openDialog(fragment: BaseSingleFragment, anchorView: View? = null, useFullWidth: Boolean = true) {
+        baseSingleActivity.openDialog(fragment, anchorView, useFullWidth)
     }
 
     /**

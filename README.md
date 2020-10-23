@@ -24,7 +24,7 @@ openDialog(myFragment)
 // you can simply navigate through the back stack using:
 navigateBack()
 navigateBackToRoot()
-navigateBackToFragment("fragmentName")
+navigateBackTo("fragmentName")
 
 // define your root fragment(s). Those will be held at the bottom of stack, intended as the initial activity's fragment
 override fun getNewRootFragmentInstance(positionIndex: Int): BaseSingleFragment? {

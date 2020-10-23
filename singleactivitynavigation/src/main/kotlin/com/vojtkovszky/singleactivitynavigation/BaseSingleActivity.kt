@@ -9,9 +9,17 @@ import androidx.appcompat.app.AppCompatDialogFragment
 abstract class BaseSingleActivity: AppCompatActivity() {
 
     /**
-     * An id of a container view where all main and secondary fragments will be added to.
+     * An id of a container view where fragments fragments will be added to. It will be used as
+     * a container for all fragments, unless you wan
      */
-    abstract val fragmentContainerId: Int
+    abstract val defaultFragmentContainerId: Int
+
+    /**
+     * An id of a container view where root fragments will be added to. Can be same as
+     * [defaultFragmentContainerId] unless you want to utilize master/detail view
+     */
+    open val rootFragmentContainerId: Int
+        get() = defaultFragmentContainerId
 
     /**
      * Represents a secondary fragment currently of the top of back stack, or null if back stack is empty.
@@ -28,18 +36,6 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     var closeDialogsAndSheetsWhileNavigating: Boolean = true
 
     /**
-     * Represents a currently opened dialog fragment or null if dialog is not opened.
-     */
-    @SuppressWarnings("WeakerAccess")
-    var currentDialogFragment: BaseSingleDialogFragment? = null
-
-    /**
-     * Represents a currently opened bottom sheet fragment or null if bottom sheet is not opened.
-     */
-    @SuppressWarnings("WeakerAccess")
-    var currentBottomSheetFragment: BaseSingleBottomSheetFragment? = null
-
-    /**
      * Define a default custom animation settings for fragment transaction animations.
      * If you want fragment to behave differently, simply
      */
@@ -51,6 +47,16 @@ abstract class BaseSingleActivity: AppCompatActivity() {
      * itself is invoked when [selectRootFragment] is called
      */
     private val rootFragments = mutableListOf<BaseSingleFragment?>()
+
+    /**
+     * Represents a currently opened dialog fragment or null if dialog is not opened.
+     */
+    private var currentDialogFragment: BaseSingleDialogFragment? = null
+
+    /**
+     * Represents a currently opened bottom sheet fragment or null if bottom sheet is not opened.
+     */
+    private var currentBottomSheetFragment: BaseSingleBottomSheetFragment? = null
 
     /**
      * Extending activity is required to define at least one main (root) Fragment,
@@ -163,11 +169,13 @@ abstract class BaseSingleActivity: AppCompatActivity() {
 
     /**
      * Open a given [fragment] in a dialog.
-     * If [anchorView] is provided, it will try to anchor dialog position to it, either above or below it.
+     * @param anchorView if provided, it will try to anchor dialog position to it, either above or below it.
+     * @param useFullWidth by default, dialog tends to be very narrow, setting this to true will make
+     * container width match window width
      */
-    fun openDialog(fragment: BaseSingleFragment, anchorView: View? = null) {
+    fun openDialog(fragment: BaseSingleFragment, anchorView: View? = null, useFullWidth: Boolean = true) {
         closeCurrentlyOpenDialog()
-        with(BaseSingleDialogFragment.newInstance(anchorView)) {
+        with(BaseSingleDialogFragment.newInstance(anchorView, useFullWidth)) {
             currentDialogFragment = this
             this.fragment = fragment
             this.fragment.fragmentType = FragmentType.DIALOG
@@ -252,8 +260,11 @@ abstract class BaseSingleActivity: AppCompatActivity() {
                 addToBackStack(fragment::class.simpleName)
             }
 
-            // replace and commit
-            replace(fragmentContainerId, fragment, fragment::class.simpleName)
+            // replace
+            replace(if (fragment.fragmentType == FragmentType.ROOT) rootFragmentContainerId else defaultFragmentContainerId,
+                fragment, fragment::class.simpleName)
+
+            // and finally commit
             commitAllowingStateLoss()
         }
     }
