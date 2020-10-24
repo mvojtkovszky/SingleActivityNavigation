@@ -12,7 +12,7 @@ abstract class BaseSingleFragment: Fragment() {
     /**
      * Represents type of this fragment instance. See [FragmentType] for more info.
      */
-    var fragmentType: FragmentType = FragmentType.DEFAULT
+    var fragmentType: FragmentType = FragmentType.INVALID
         internal set
 
     /**
@@ -20,6 +20,12 @@ abstract class BaseSingleFragment: Fragment() {
      */
     val baseSingleActivity: BaseSingleActivity
         get() = requireActivity() as BaseSingleActivity
+
+    /**
+     * In case fragment is always modal, this value will override it, so we don't have to
+     * set it in [BaseSingleActivity.navigateTo] every time we navigate to it
+     */
+    open val isModal = false
 
     /**
      * Z translation of the fragment, allows fragments to overlap nicely when using animations.

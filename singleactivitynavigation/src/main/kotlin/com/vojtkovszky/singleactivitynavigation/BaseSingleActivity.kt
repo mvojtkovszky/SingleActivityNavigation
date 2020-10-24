@@ -150,7 +150,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
             }
         }
 
-        fragment.fragmentType = if (openAsModal) FragmentType.MODAL else FragmentType.DEFAULT
+        fragment.fragmentType = if (openAsModal || fragment.isModal) FragmentType.MODAL else FragmentType.DEFAULT
         commitTransaction(fragment, true)
     }
 

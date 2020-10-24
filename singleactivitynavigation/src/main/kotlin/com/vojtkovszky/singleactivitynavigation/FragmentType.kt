@@ -29,7 +29,13 @@ enum class FragmentType {
     /**
      * Fragment opened and contained in a bottom sheet
      */
-    BOTTOM_SHEET;
+    BOTTOM_SHEET,
+
+    /**
+     * Fragment was not committed using a transaction from [BaseSingleActivity].
+     * Happens if we use [BaseSingleFragment] class on its own.
+     */
+    INVALID;
 
     // region helper methods
     /**
