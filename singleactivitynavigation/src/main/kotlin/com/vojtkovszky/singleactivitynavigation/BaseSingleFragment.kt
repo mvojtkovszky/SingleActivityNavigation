@@ -22,8 +22,8 @@ abstract class BaseSingleFragment: Fragment() {
         get() = requireActivity() as BaseSingleActivity
 
     /**
-     * In case fragment is always modal, this value will override it, so we don't have to
-     * set it in [BaseSingleActivity.navigateTo] every time we navigate to it
+     * In case fragment is always modal, this value will parameter in [BaseSingleActivity.navigateTo],
+     * so we don't have to set it every time we navigate to it.
      */
     open val isModal = false
 

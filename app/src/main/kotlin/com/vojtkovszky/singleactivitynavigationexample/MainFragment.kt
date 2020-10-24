@@ -24,6 +24,7 @@ class MainFragment : BaseSingleFragment() {
             FragmentType.ROOT -> R.string.type_root
             FragmentType.MODAL -> R.string.type_modal
             FragmentType.DEFAULT -> R.string.type_regular
+            FragmentType.INVALID -> 0
         })
 
         // use it to set status text
