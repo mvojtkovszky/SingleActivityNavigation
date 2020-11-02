@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.annotation.AnimRes
 import androidx.core.view.ViewCompat
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 
 @Suppress("unused")
@@ -22,10 +23,17 @@ abstract class BaseSingleFragment: Fragment() {
         get() = requireActivity() as BaseSingleActivity
 
     /**
-     * In case fragment is always modal, this value will parameter in [BaseSingleActivity.navigateTo],
-     * so we don't have to set it every time we navigate to it.
+     * In case fragment is always modal, this value will allow to override parameter set
+     * in [BaseSingleActivity.navigateTo], so we don't have to set it every time we navigate to it.
      */
-    open val isModal = false
+    open val isModal: Boolean
+        get() = fragmentType == FragmentType.MODAL
+
+    /**
+     * If set to true, [BaseSingleActivity]'s onBackPressed method will be prevented from invoking.
+     */
+    open val overridesBackPress: Boolean
+        get() = false
 
     /**
      * Z translation of the fragment, allows fragments to overlap nicely when using animations.
@@ -111,8 +119,9 @@ abstract class BaseSingleFragment: Fragment() {
     /**
      * Shortcut to [BaseSingleActivity.openDialog]
      */
-    fun openDialog(fragment: BaseSingleFragment, anchorView: View? = null, useFullWidth: Boolean = true) {
-        baseSingleActivity.openDialog(fragment, anchorView, useFullWidth)
+    fun openDialog(fragment: BaseSingleFragment, anchorView: View? = null, useFullWidth: Boolean = true,
+                   dialogStyle: Int = DialogFragment.STYLE_NORMAL, dialogTheme: Int = 0) {
+        baseSingleActivity.openDialog(fragment, anchorView, useFullWidth, dialogStyle, dialogTheme)
     }
 
     /**

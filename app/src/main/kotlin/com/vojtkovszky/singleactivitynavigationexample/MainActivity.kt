@@ -6,7 +6,7 @@ import com.vojtkovszky.singleactivitynavigation.BaseSingleActivity
 import com.vojtkovszky.singleactivitynavigation.BaseSingleFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity() : BaseSingleActivity() {
+class MainActivity : BaseSingleActivity() {
 
     companion object {
         // positions for root fragments in bottom navigation

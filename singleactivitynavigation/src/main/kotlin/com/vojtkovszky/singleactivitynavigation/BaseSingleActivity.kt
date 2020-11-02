@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.fragment.app.DialogFragment
 
 @Suppress("unused")
 abstract class BaseSingleActivity: AppCompatActivity() {
@@ -22,11 +23,10 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         get() = defaultFragmentContainerId
 
     /**
-     * Represents a secondary fragment currently of the top of back stack, or null if back stack is empty.
+     * Represents a latest fragment added to the fragment manager.
      */
-    val currentSecondaryFragment: BaseSingleFragment?
+    val currentFragment: BaseSingleFragment?
         get() = supportFragmentManager.fragments.filterIsInstance<BaseSingleFragment>().lastOrNull()
-
 
     /**
      * A modifier allowing to set behaviour while navigating through fragments
@@ -134,7 +134,8 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     /**
      * Navigate to a fragment which will be added to the top of back stack as a secondary fragment
      * @param fragment fragment to navigate to
-     * @param openAsModal
+     * @param openAsModal define if fragment should be [FragmentType.MODAL] instead of [FragmentType.DEFAULT].
+     * This behaviour can also be defined by fragment itself by overriding [BaseSingleFragment.isModal].
      * @param ignoreIfAlreadyInStack if same type of fragment already exists in back stack, transaction will be ignored.
      */
     fun navigateTo(fragment: BaseSingleFragment,
@@ -171,11 +172,18 @@ abstract class BaseSingleActivity: AppCompatActivity() {
      * Open a given [fragment] in a dialog.
      * @param anchorView if provided, it will try to anchor dialog position to it, either above or below it.
      * @param useFullWidth by default, dialog tends to be very narrow, setting this to true will make
+     * @param dialogStyle see [DialogFragment.setStyle]
+     * @param dialogTheme see [DialogFragment.setStyle]
      * container width match window width
      */
-    fun openDialog(fragment: BaseSingleFragment, anchorView: View? = null, useFullWidth: Boolean = true) {
+    fun openDialog(fragment: BaseSingleFragment,
+                   anchorView: View? = null,
+                   useFullWidth: Boolean = true,
+                   dialogStyle: Int = DialogFragment.STYLE_NORMAL,
+                   dialogTheme: Int = 0) {
         closeCurrentlyOpenDialog()
         with(BaseSingleDialogFragment.newInstance(anchorView, useFullWidth)) {
+            setStyle(dialogStyle, dialogTheme)
             currentDialogFragment = this
             this.fragment = fragment
             this.fragment.fragmentType = FragmentType.DIALOG
@@ -209,6 +217,14 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         supportFragmentManager.addOnBackStackChangedListener {
             onBackStackChanged(supportFragmentManager.backStackEntryCount)
         }
+    }
+
+    // backpress handling
+    override fun onBackPressed() {
+        if (currentFragment?.overridesBackPress == true) {
+            return
+        }
+        super.onBackPressed()
     }
 
     // logic to dismiss a dialog fragment
