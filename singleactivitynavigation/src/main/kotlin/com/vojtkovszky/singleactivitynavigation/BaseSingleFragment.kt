@@ -4,36 +4,41 @@ import android.os.Bundle
 import android.view.View
 import androidx.annotation.AnimRes
 import androidx.core.view.ViewCompat
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 
 @Suppress("unused")
 abstract class BaseSingleFragment: Fragment() {
-    /**
-     * Determine if a fragment is a modal.
-     * That usually effects the animation behaviour.
-     */
-    open var isModal: Boolean = false
 
     /**
-     * Indicates if this fragment is contained in a bottom sheet
+     * Represents type of this fragment instance. See [FragmentType] for more info.
      */
-    var isInBottomSheet = false
-
-    /**
-     * Indicates if this fragment is contained in a dialog
-     */
-    var isInDialog = false
-
-    /**
-     * Z translation of the fragment, used internally.
-     */
-    var translationZ: Float = 0f
+    var fragmentType: FragmentType = FragmentType.INVALID
+        internal set
 
     /**
      * Reference to activity holding this fragment
      */
-    val baseSingleActivity: BaseSingleActivity
-        get() = requireActivity() as BaseSingleActivity
+    val baseSingleActivity: BaseSingleActivity?
+        get() = activity as BaseSingleActivity?
+
+    /**
+     * In case fragment is always modal, this value will allow to override parameter set
+     * in [BaseSingleActivity.navigateTo], so we don't have to set it every time we navigate to it.
+     */
+    open val isModal: Boolean
+        get() = fragmentType == FragmentType.MODAL
+
+    /**
+     * If set to true, [BaseSingleActivity]'s onBackPressed method will be prevented from invoking.
+     */
+    open val overridesBackPress: Boolean
+        get() = false
+
+    /**
+     * Z translation of the fragment, allows fragments to overlap nicely when using animations.
+     */
+    internal var translationZ: Float = 0f
 
     // region animations
     /**
@@ -69,70 +74,68 @@ abstract class BaseSingleFragment: Fragment() {
 
     // region shortcuts to baseSingleActivity methods
     /**
-     * Shortcut to [BaseSingleActivity.navigateBackToFragment]
+     * Shortcut to [BaseSingleActivity.navigateBackTo]
      */
-    fun navigateBackToFragment(fragmentName: String) {
-        baseSingleActivity.navigateBackToFragment(fragmentName)
+    fun navigateBackTo(fragmentName: String) {
+        baseSingleActivity?.navigateBackTo(fragmentName)
     }
 
     /**
-     * Shortcut to [BaseSingleActivity.navigateBackToFragment]
+     * Shortcut to [BaseSingleActivity.navigateBack]
      */
-    fun navigateBack(backIfBackStackEmpty: Boolean = true) {
-        baseSingleActivity.navigateBack(backIfBackStackEmpty)
+    fun navigateBack() {
+        baseSingleActivity?.navigateBack()
     }
 
     /**
      * Shortcut to [BaseSingleActivity.navigateBackToRoot]
      */
-    fun navigateBackToRoot(closeDialogsAndSheets: Boolean = true) {
-        baseSingleActivity.navigateBackToRoot(closeDialogsAndSheets)
+    fun navigateBackToRoot() {
+        baseSingleActivity?.navigateBackToRoot()
     }
 
     /**
      * Shortcut to [BaseSingleActivity.selectRootFragment]
      */
-    fun selectRootFragment(positionIndex: Int = 0,
-                           popStack: Boolean = true,
-                           closeDialogsAndSheets: Boolean = true) {
-        baseSingleActivity.selectRootFragment(positionIndex, popStack, closeDialogsAndSheets)
+    fun selectRootFragment(positionIndex: Int = 0, popStack: Boolean = true) {
+        baseSingleActivity?.selectRootFragment(positionIndex, popStack)
     }
 
     /**
      * Shortcut to [BaseSingleActivity.navigateTo]
      */
-    fun navigateTo(fragment: BaseSingleFragment,
-                   ignoreIfAlreadyInStack: Boolean = false,
-                   closeDialogsAndSheets: Boolean = true) {
-        baseSingleActivity.navigateTo(fragment, ignoreIfAlreadyInStack, closeDialogsAndSheets)
+    fun navigateTo(fragment: BaseSingleFragment, openAsModal: Boolean = false,
+                   ignoreIfAlreadyInStack: Boolean = false) {
+        baseSingleActivity?.navigateTo(fragment, openAsModal, ignoreIfAlreadyInStack)
     }
 
     /**
      * Shortcut to [BaseSingleActivity.openBottomSheet]
      */
     fun openBottomSheet(fragment: BaseSingleFragment) {
-        baseSingleActivity.openBottomSheet(fragment)
+        baseSingleActivity?.openBottomSheet(fragment)
     }
 
     /**
      * Shortcut to [BaseSingleActivity.openDialog]
      */
-    fun openDialog(fragment: BaseSingleFragment, anchorView: View? = null) {
-        baseSingleActivity.openDialog(fragment, anchorView)
+    fun openDialog(fragment: BaseSingleFragment, anchorView: View? = null, useFullWidth: Boolean = true,
+                   dialogStyle: Int = DialogFragment.STYLE_NORMAL, dialogTheme: Int = 0) {
+        baseSingleActivity?.openDialog(fragment, anchorView, useFullWidth, dialogStyle, dialogTheme)
     }
 
     /**
      * Shortcut to [BaseSingleActivity.closeCurrentlyOpenBottomSheet]
      */
     fun closeCurrentlyOpenBottomSheet() {
-        baseSingleActivity.closeCurrentlyOpenBottomSheet()
+        baseSingleActivity?.closeCurrentlyOpenBottomSheet()
     }
 
     /**
      * Shortcut to [BaseSingleActivity.closeCurrentlyOpenDialog]
      */
     fun closeCurrentlyOpenDialog() {
-        baseSingleActivity.closeCurrentlyOpenDialog()
+        baseSingleActivity?.closeCurrentlyOpenDialog()
     }
     // endregion shortcuts to baseSingleActivity methods
 

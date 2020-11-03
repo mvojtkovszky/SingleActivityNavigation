@@ -8,18 +8,25 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseSingleActivity() {
 
+    companion object {
+        // positions for root fragments in bottom navigation
+        private const val ROOT_FRAGMENT_POS_HOME = 0
+        private const val ROOT_FRAGMENT_POS_DASHBOARD = 1
+        private const val ROOT_FRAGMENT_POS_NOTIFICATIONS = 2
+    }
+
     // define main fragments based on position
     override fun getNewRootFragmentInstance(positionIndex: Int): BaseSingleFragment? {
         return when (positionIndex) {
-            0 -> MainFragment.newInstance(getString(R.string.title_home), isRoot = true)
-            1 -> MainFragment.newInstance(getString(R.string.title_dashboard), isRoot = true)
-            2 -> MainFragment.newInstance(getString(R.string.title_notifications), isRoot = true)
+            // we'll use same fragment for all root positions
+            ROOT_FRAGMENT_POS_HOME, ROOT_FRAGMENT_POS_DASHBOARD, ROOT_FRAGMENT_POS_NOTIFICATIONS ->
+                MainFragment()
             else -> null
         }
     }
 
-    // define container where fragments will be held
-    override val fragmentContainerId: Int = R.id.fragmentContainer
+    // define containers where fragments will be held
+    override val defaultFragmentContainerId: Int = R.id.fragmentContainer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,9 +35,9 @@ class MainActivity : BaseSingleActivity() {
         // we'll be switching main fragments with out bottom navigation
         navigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.navigation_home -> selectRootFragment(0)
-                R.id.navigation_dashboard -> selectRootFragment(1)
-                R.id.navigation_notifications -> selectRootFragment(2)
+                R.id.navigation_home -> selectRootFragment(ROOT_FRAGMENT_POS_HOME)
+                R.id.navigation_dashboard -> selectRootFragment(ROOT_FRAGMENT_POS_DASHBOARD)
+                R.id.navigation_notifications -> selectRootFragment(ROOT_FRAGMENT_POS_NOTIFICATIONS)
                 else -> return@setOnNavigationItemSelectedListener false
             }
             return@setOnNavigationItemSelectedListener true
@@ -46,8 +53,8 @@ class MainActivity : BaseSingleActivity() {
             R.anim.enter_from_right, R.anim.exit_to_left_short,
             R.anim.enter_from_left_short, R.anim.exit_to_right)
 
-        // select default fragment on tab 1
-        selectRootFragment()
+        // use home fragment as default
+        selectRootFragment(ROOT_FRAGMENT_POS_HOME)
     }
 
     override fun onBackStackChanged(backStackCount: Int) {
