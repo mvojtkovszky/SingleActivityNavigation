@@ -31,7 +31,7 @@ class MainFragment : BaseSingleFragment() {
         textStatus.text = getString(R.string.this_is_type_fragment, title)
         // and change title, but not needed in dialog
         if (!fragmentType.isDialogOrBottomSheet()) {
-            baseSingleActivity.supportActionBar?.title = title
+            baseSingleActivity?.supportActionBar?.title = title
         }
 
         // click listeners on buttons
