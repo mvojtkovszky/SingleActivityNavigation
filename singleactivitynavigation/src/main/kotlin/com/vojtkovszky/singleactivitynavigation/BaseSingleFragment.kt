@@ -19,8 +19,8 @@ abstract class BaseSingleFragment: Fragment() {
     /**
      * Reference to activity holding this fragment
      */
-    val baseSingleActivity: BaseSingleActivity
-        get() = requireActivity() as BaseSingleActivity
+    val baseSingleActivity: BaseSingleActivity?
+        get() = activity as BaseSingleActivity?
 
     /**
      * In case fragment is always modal, this value will allow to override parameter set
@@ -77,28 +77,28 @@ abstract class BaseSingleFragment: Fragment() {
      * Shortcut to [BaseSingleActivity.navigateBackTo]
      */
     fun navigateBackTo(fragmentName: String) {
-        baseSingleActivity.navigateBackTo(fragmentName)
+        baseSingleActivity?.navigateBackTo(fragmentName)
     }
 
     /**
      * Shortcut to [BaseSingleActivity.navigateBack]
      */
     fun navigateBack() {
-        baseSingleActivity.navigateBack()
+        baseSingleActivity?.navigateBack()
     }
 
     /**
      * Shortcut to [BaseSingleActivity.navigateBackToRoot]
      */
     fun navigateBackToRoot() {
-        baseSingleActivity.navigateBackToRoot()
+        baseSingleActivity?.navigateBackToRoot()
     }
 
     /**
      * Shortcut to [BaseSingleActivity.selectRootFragment]
      */
     fun selectRootFragment(positionIndex: Int = 0, popStack: Boolean = true) {
-        baseSingleActivity.selectRootFragment(positionIndex, popStack)
+        baseSingleActivity?.selectRootFragment(positionIndex, popStack)
     }
 
     /**
@@ -106,14 +106,14 @@ abstract class BaseSingleFragment: Fragment() {
      */
     fun navigateTo(fragment: BaseSingleFragment, openAsModal: Boolean = false,
                    ignoreIfAlreadyInStack: Boolean = false) {
-        baseSingleActivity.navigateTo(fragment, openAsModal, ignoreIfAlreadyInStack)
+        baseSingleActivity?.navigateTo(fragment, openAsModal, ignoreIfAlreadyInStack)
     }
 
     /**
      * Shortcut to [BaseSingleActivity.openBottomSheet]
      */
     fun openBottomSheet(fragment: BaseSingleFragment) {
-        baseSingleActivity.openBottomSheet(fragment)
+        baseSingleActivity?.openBottomSheet(fragment)
     }
 
     /**
@@ -121,21 +121,21 @@ abstract class BaseSingleFragment: Fragment() {
      */
     fun openDialog(fragment: BaseSingleFragment, anchorView: View? = null, useFullWidth: Boolean = true,
                    dialogStyle: Int = DialogFragment.STYLE_NORMAL, dialogTheme: Int = 0) {
-        baseSingleActivity.openDialog(fragment, anchorView, useFullWidth, dialogStyle, dialogTheme)
+        baseSingleActivity?.openDialog(fragment, anchorView, useFullWidth, dialogStyle, dialogTheme)
     }
 
     /**
      * Shortcut to [BaseSingleActivity.closeCurrentlyOpenBottomSheet]
      */
     fun closeCurrentlyOpenBottomSheet() {
-        baseSingleActivity.closeCurrentlyOpenBottomSheet()
+        baseSingleActivity?.closeCurrentlyOpenBottomSheet()
     }
 
     /**
      * Shortcut to [BaseSingleActivity.closeCurrentlyOpenDialog]
      */
     fun closeCurrentlyOpenDialog() {
-        baseSingleActivity.closeCurrentlyOpenDialog()
+        baseSingleActivity?.closeCurrentlyOpenDialog()
     }
     // endregion shortcuts to baseSingleActivity methods
 
