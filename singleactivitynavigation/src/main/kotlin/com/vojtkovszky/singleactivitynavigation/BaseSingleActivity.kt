@@ -9,6 +9,10 @@ import androidx.fragment.app.DialogFragment
 @Suppress("unused")
 abstract class BaseSingleActivity: AppCompatActivity() {
 
+    companion object {
+        private const val ARG_CUSTOM_ANIMATIONS = "BaseSingleActivity.ARG_CUSTOM_ANIMATIONS"
+    }
+
     /**
      * An id of a container view where fragments fragments will be added to. It will be used as
      * a container for all fragments, unless you wan
@@ -39,8 +43,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
      * Define a default custom animation settings for fragment transaction animations.
      * If you want fragment to behave differently, simply
      */
-    @SuppressWarnings("WeakerAccess")
-    val customAnimationSettings = CustomAnimationSettings()
+    var customAnimationSettings = CustomAnimationSettings()
 
     /**
      * used to hold references to root fragments retrieved from [getNewRootFragmentInstance], which
@@ -119,7 +122,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
 
         if (rootFragments[positionIndex] == null) {
             rootFragments[positionIndex] = getNewRootFragmentInstance(positionIndex)?.also {
-                it.fragmentType = FragmentType.ROOT
+                it.addFragmentTypeToBundle(FragmentType.ROOT)
             }
         }
 
@@ -151,7 +154,10 @@ abstract class BaseSingleActivity: AppCompatActivity() {
             }
         }
 
-        fragment.fragmentType = if (openAsModal || fragment.isModal) FragmentType.MODAL else FragmentType.DEFAULT
+        fragment.addFragmentTypeToBundle(
+                if (openAsModal || fragment.isModal) FragmentType.MODAL
+                else FragmentType.DEFAULT)
+
         commitTransaction(fragment, true)
     }
 
@@ -163,7 +169,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         with(BaseSingleBottomSheetFragment()) {
             currentBottomSheetFragment = this
             this.fragment = fragment
-            this.fragment.fragmentType = FragmentType.BOTTOM_SHEET
+            this.fragment.addFragmentTypeToBundle(FragmentType.BOTTOM_SHEET)
             this.show(supportFragmentManager, fragment::class.simpleName)
         }
     }
@@ -186,7 +192,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
             setStyle(dialogStyle, dialogTheme)
             currentDialogFragment = this
             this.fragment = fragment
-            this.fragment.fragmentType = FragmentType.DIALOG
+            this.fragment.addFragmentTypeToBundle(FragmentType.DIALOG)
             this.show(supportFragmentManager, fragment::class.simpleName)
         }
     }
@@ -219,12 +225,25 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         }
     }
 
-    // backpress handling
+    // back press handling
     override fun onBackPressed() {
         if (currentFragment?.overridesBackPress == true) {
             return
         }
         super.onBackPressed()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        // store custom animations
+        outState.putSerializable(ARG_CUSTOM_ANIMATIONS, customAnimationSettings)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        // retrieve custom animations
+        customAnimationSettings = (savedInstanceState.getSerializable(ARG_CUSTOM_ANIMATIONS)
+                ?: CustomAnimationSettings()) as CustomAnimationSettings
     }
 
     // logic to dismiss a dialog fragment
@@ -242,7 +261,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         // if fragment will be added to back stack, it need to get in front of the fragment replacing
         // it in order for animations to play nicely
         if (addToBackStack) {
-            fragment.translationZ = supportFragmentManager.backStackEntryCount + 1f
+            fragment.addTranslationZToBundle(supportFragmentManager.backStackEntryCount + 1f)
         }
 
         // setup transaction

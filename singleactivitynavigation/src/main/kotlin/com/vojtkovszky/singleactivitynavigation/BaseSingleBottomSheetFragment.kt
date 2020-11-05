@@ -16,15 +16,19 @@ internal class BaseSingleBottomSheetFragment: BottomSheetDialogFragment() {
 
     // fragment is to be set before dialog is created.
     // It will be attached to dialog's base view when the dialog is created.
-    lateinit var fragment: BaseSingleFragment
+    internal lateinit var fragment: BaseSingleFragment
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return FrameLayout(requireActivity()).apply {
             id = R.id.bottomSheetFragment
-            childFragmentManager
-                .beginTransaction()
-                .replace(R.id.bottomSheetFragment, fragment, fragment::class.simpleName)
-                .commitAllowingStateLoss()
+            // fragment transaction is not needed if restoring from instance state as fragment
+            // will be recreated in container.
+            if (savedInstanceState == null && ::fragment.isInitialized) {
+                childFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.bottomSheetFragment, fragment, fragment::class.simpleName)
+                        .commitAllowingStateLoss()
+            }
         }
     }
 

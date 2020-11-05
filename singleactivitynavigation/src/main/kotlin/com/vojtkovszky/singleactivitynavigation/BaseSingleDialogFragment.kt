@@ -34,7 +34,7 @@ internal class BaseSingleDialogFragment: AppCompatDialogFragment() {
 
     // fragment is to be set before dialog is created.
     // It will be attached to dialog's base view when the dialog is created.
-    lateinit var fragment: BaseSingleFragment
+    internal lateinit var fragment: BaseSingleFragment
 
     private var anchorHeight: Int = 0
     private var anchorX: Float = 0f
@@ -54,10 +54,14 @@ internal class BaseSingleDialogFragment: AppCompatDialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return FrameLayout(requireActivity()).apply {
             id = R.id.dialogFragment
-            childFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.dialogFragment, fragment, fragment::class.simpleName)
-                    .commitAllowingStateLoss()
+            // fragment transaction is not needed if restoring from instance state as fragment
+            // will be recreated in container.
+            if (savedInstanceState == null && ::fragment.isInitialized) {
+                childFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.dialogFragment, fragment, fragment::class.simpleName)
+                        .commitAllowingStateLoss()
+            }
         }
     }
 
