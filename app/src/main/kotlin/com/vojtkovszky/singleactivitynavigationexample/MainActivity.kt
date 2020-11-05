@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import com.vojtkovszky.singleactivitynavigation.BaseSingleActivity
 import com.vojtkovszky.singleactivitynavigation.BaseSingleFragment
+import com.vojtkovszky.singleactivitynavigation.FragmentType
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseSingleActivity() {
@@ -52,7 +53,7 @@ class MainActivity : BaseSingleActivity() {
         if (savedInstanceState == null) {
             // set animation behaviour
             customAnimationSettings.setCustomAnimationsRoot(
-                    R.anim.enter_fade_in, 0, 0, 0)
+                    0, 0, 0, 0)
             customAnimationSettings.setCustomAnimationsModal(
                     R.anim.enter_from_bottom, R.anim.exit_to_top_short,
                     R.anim.enter_from_top_short, R.anim.exit_to_bottom)
