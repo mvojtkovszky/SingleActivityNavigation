@@ -1,6 +1,6 @@
 # SingleActivityNavigation
-A single activity application framework with straightforward navigation controlls, allowing free
-movement between fragments and different containers using a single line of code.
+A single activity application framework with straightforward navigation controls, allowing free 
+movement between fragments through different containers using a single line of code.
 <br/><br/>
 <img src="example.gif" alt="Example Flow" width="320"/>
 
