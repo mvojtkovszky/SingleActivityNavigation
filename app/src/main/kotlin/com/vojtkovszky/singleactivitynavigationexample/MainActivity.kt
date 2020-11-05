@@ -60,6 +60,8 @@ class MainActivity : BaseSingleActivity() {
                     R.anim.enter_from_right, R.anim.exit_to_left_short,
                     R.anim.enter_from_left_short, R.anim.exit_to_right)
 
+            closeDialogsAndSheetsWhileNavigating = true
+
             // select fragment
             selectRootFragment(selectedTabIndex)
         }
