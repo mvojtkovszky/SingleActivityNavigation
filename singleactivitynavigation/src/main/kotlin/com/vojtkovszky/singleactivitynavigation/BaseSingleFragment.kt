@@ -10,11 +10,16 @@ import androidx.fragment.app.Fragment
 @Suppress("unused")
 abstract class BaseSingleFragment: Fragment() {
 
+    companion object {
+        private const val ARG_FRAGMENT_TYPE_NAME = "BaseSingleFragment.ARG_FRAGMENT_TYPE_NAME"
+        private const val ARG_TRANSLATION_Z = "BaseSingleFragment.ARG_TRANSLATION_Z"
+    }
+
     /**
      * Represents type of this fragment instance. See [FragmentType] for more info.
      */
     var fragmentType: FragmentType = FragmentType.INVALID
-        internal set
+        private set
 
     /**
      * Reference to activity holding this fragment
@@ -38,7 +43,7 @@ abstract class BaseSingleFragment: Fragment() {
     /**
      * Z translation of the fragment, allows fragments to overlap nicely when using animations.
      */
-    internal var translationZ: Float = 0f
+    private var translationZ: Float = 0f
 
     // region animations
     /**
@@ -139,8 +144,36 @@ abstract class BaseSingleFragment: Fragment() {
     }
     // endregion shortcuts to baseSingleActivity methods
 
+    // region add bundle
+    /**
+     * Add [FragmentType] to [Bundle] so value is kept in case underlying activity gets recreated.
+     */
+    internal fun addFragmentTypeToBundle(fragmentType: FragmentType) {
+        // add it immediately so we can have access to it even before fragment is created
+        this.fragmentType = fragmentType
+        arguments = (arguments ?: Bundle()).apply {
+            putString(ARG_FRAGMENT_TYPE_NAME, fragmentType.name)
+        }
+    }
+    /**
+     * Add [translationZ] to [Bundle] so value is kept in case underlying activity gets recreated.
+     */
+    internal fun addTranslationZToBundle(translationZ: Float) {
+        arguments = (arguments ?: Bundle()).apply {
+            putFloat(ARG_TRANSLATION_Z, translationZ)
+        }
+    }
+    // endregion add bundle
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         ViewCompat.setTranslationZ(view, translationZ)
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        fragmentType = FragmentType.values().firstOrNull {
+            it.name == arguments?.getString(ARG_FRAGMENT_TYPE_NAME) } ?: FragmentType.INVALID
+        translationZ = arguments?.getFloat(ARG_TRANSLATION_Z) ?: 0f
     }
 }

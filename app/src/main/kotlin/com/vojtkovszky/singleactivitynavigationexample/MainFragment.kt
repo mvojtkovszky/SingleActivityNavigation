@@ -29,6 +29,8 @@ class MainFragment : BaseSingleFragment() {
 
         // use it to set status text
         textStatus.text = getString(R.string.this_is_type_fragment, title)
+        textStackSize.text = getString(R.string.stack_size_is,
+                activity?.supportFragmentManager?.backStackEntryCount ?: -1)
         // and change title, but not needed in dialog
         if (!fragmentType.isDialogOrBottomSheet()) {
             baseSingleActivity?.supportActionBar?.title = title

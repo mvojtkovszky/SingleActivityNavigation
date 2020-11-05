@@ -9,6 +9,9 @@ import androidx.fragment.app.FragmentManager
 /**
  * A dialog fragment acting as a container for our [BaseSingleFragment], created when
  * [BaseSingleActivity.openDialog] is called.
+ *
+ * Only to be used internally as [BaseSingleActivity] will always know how to handle
+ * child fragments by itself.
  */
 internal class BaseSingleDialogFragment: AppCompatDialogFragment() {
 
@@ -34,7 +37,9 @@ internal class BaseSingleDialogFragment: AppCompatDialogFragment() {
 
     // fragment is to be set before dialog is created.
     // It will be attached to dialog's base view when the dialog is created.
-    lateinit var fragment: BaseSingleFragment
+    // Don't rely on this instance as it will be lost when/if underlying activity is recreated.
+    // To retrieve fragment once attached, use getInnerFragment() instead
+    internal lateinit var fragment: BaseSingleFragment
 
     private var anchorHeight: Int = 0
     private var anchorX: Float = 0f
@@ -54,10 +59,14 @@ internal class BaseSingleDialogFragment: AppCompatDialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return FrameLayout(requireActivity()).apply {
             id = R.id.dialogFragment
-            childFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.dialogFragment, fragment, fragment::class.simpleName)
-                    .commitAllowingStateLoss()
+            // fragment transaction is not needed if restoring from instance state as fragment
+            // will be recreated in container.
+            if (savedInstanceState == null && ::fragment.isInitialized) {
+                childFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.dialogFragment, fragment, fragment::class.simpleName)
+                        .commitAllowingStateLoss()
+            }
         }
     }
 
@@ -105,5 +114,12 @@ internal class BaseSingleDialogFragment: AppCompatDialogFragment() {
             "Fragment or view needs to be set before calling show"
         }
         super.show(manager, tag)
+    }
+
+    /**
+     * Returns current child fragment attached to this fragment
+     */
+    internal fun getInnerFragment(): BaseSingleFragment? {
+        return childFragmentManager.fragments.filterIsInstance<BaseSingleFragment>().lastOrNull()
     }
 }

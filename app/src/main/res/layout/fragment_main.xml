@@ -17,7 +17,15 @@
             android:id="@+id/textStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:textColor="@color/black"
+            android:layout_gravity="center_horizontal"/>
+        <TextView
+            android:id="@+id/textStackSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:textColor="@color/black"
             android:layout_gravity="center_horizontal"/>
 
         <Button

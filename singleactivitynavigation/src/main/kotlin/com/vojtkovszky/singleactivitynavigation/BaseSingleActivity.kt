@@ -9,6 +9,11 @@ import androidx.fragment.app.DialogFragment
 @Suppress("unused")
 abstract class BaseSingleActivity: AppCompatActivity() {
 
+    companion object {
+        private const val ARG_CUSTOM_ANIMATIONS = "BaseSingleActivity.ARG_CUSTOM_ANIMATIONS"
+        private const val ARG_CLOSE_DIALOGS_WHILE_NAV = "BaseSingleActivity.ARG_CLOSE_DIALOGS_WHILE_NAV"
+    }
+
     /**
      * An id of a container view where fragments fragments will be added to. It will be used as
      * a container for all fragments, unless you wan
@@ -23,40 +28,26 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         get() = defaultFragmentContainerId
 
     /**
-     * Represents a latest fragment added to the fragment manager.
-     */
-    val currentFragment: BaseSingleFragment?
-        get() = supportFragmentManager.fragments.filterIsInstance<BaseSingleFragment>().lastOrNull()
-
-    /**
      * A modifier allowing to set behaviour while navigating through fragments
      * Setting this to true (default) will mean that on every navigation change, any currently opened
      * dialogs and bottom sheet will be closed, while false will keep those open.
+     * This value is retained through instance state restoration.
      */
     var closeDialogsAndSheetsWhileNavigating: Boolean = true
 
     /**
      * Define a default custom animation settings for fragment transaction animations.
-     * If you want fragment to behave differently, simply
+     * If you want fragment to behave differently, simply override animation parameters from
+     * [BaseSingleFragment].
+     * This value is retained through instance state restoration.
      */
-    @SuppressWarnings("WeakerAccess")
-    val customAnimationSettings = CustomAnimationSettings()
+    var customAnimationSettings = CustomAnimationSettings()
 
     /**
      * used to hold references to root fragments retrieved from [getNewRootFragmentInstance], which
      * itself is invoked when [selectRootFragment] is called
      */
     private val rootFragments = mutableListOf<BaseSingleFragment?>()
-
-    /**
-     * Represents a currently opened dialog fragment or null if dialog is not opened.
-     */
-    private var currentDialogFragment: BaseSingleDialogFragment? = null
-
-    /**
-     * Represents a currently opened bottom sheet fragment or null if bottom sheet is not opened.
-     */
-    private var currentBottomSheetFragment: BaseSingleBottomSheetFragment? = null
 
     /**
      * Extending activity is required to define at least one main (root) Fragment,
@@ -72,6 +63,20 @@ abstract class BaseSingleActivity: AppCompatActivity() {
      * Note that [backStackCount] value 0 will mean we're at the root screen.
      */
     open fun onBackStackChanged(backStackCount: Int) {}
+
+    /**
+     * Represents a latest [BaseSingleFragment] added to the fragment manager, regardless of its container.
+     */
+    @SuppressWarnings("WeakerAccess")
+    fun getCurrentFragment() : BaseSingleFragment? {
+        getCurrentBottomSheetFragment()?.let { bottomSheet ->
+            bottomSheet.getInnerFragment()?.let { return@getCurrentFragment it }
+        }
+        getCurrentDialogFragment()?.let { dialogFragment ->
+            dialogFragment.getInnerFragment()?.let { return@getCurrentFragment it }
+        }
+        return supportFragmentManager.fragments.filterIsInstance<BaseSingleFragment>().lastOrNull()
+    }
 
     /**
      * pop until the fragment with given [fragmentName] is found, or all the way back to root
@@ -91,7 +96,6 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     /**
      * Pop all the way back to main fragment
      */
-    @SuppressWarnings("WeakerAccess")
     fun navigateBackToRoot() {
         navigateBackTo("")
     }
@@ -119,7 +123,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
 
         if (rootFragments[positionIndex] == null) {
             rootFragments[positionIndex] = getNewRootFragmentInstance(positionIndex)?.also {
-                it.fragmentType = FragmentType.ROOT
+                it.addFragmentTypeToBundle(FragmentType.ROOT)
             }
         }
 
@@ -151,7 +155,10 @@ abstract class BaseSingleActivity: AppCompatActivity() {
             }
         }
 
-        fragment.fragmentType = if (openAsModal || fragment.isModal) FragmentType.MODAL else FragmentType.DEFAULT
+        fragment.addFragmentTypeToBundle(
+                if (openAsModal || fragment.isModal) FragmentType.MODAL
+                else FragmentType.DEFAULT)
+
         commitTransaction(fragment, true)
     }
 
@@ -161,9 +168,8 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     fun openBottomSheet(fragment: BaseSingleFragment) {
         closeCurrentlyOpenBottomSheet()
         with(BaseSingleBottomSheetFragment()) {
-            currentBottomSheetFragment = this
             this.fragment = fragment
-            this.fragment.fragmentType = FragmentType.BOTTOM_SHEET
+            this.fragment.addFragmentTypeToBundle(FragmentType.BOTTOM_SHEET)
             this.show(supportFragmentManager, fragment::class.simpleName)
         }
     }
@@ -184,31 +190,24 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         closeCurrentlyOpenDialog()
         with(BaseSingleDialogFragment.newInstance(anchorView, useFullWidth)) {
             setStyle(dialogStyle, dialogTheme)
-            currentDialogFragment = this
             this.fragment = fragment
-            this.fragment.fragmentType = FragmentType.DIALOG
+            this.fragment.addFragmentTypeToBundle(FragmentType.DIALOG)
             this.show(supportFragmentManager, fragment::class.simpleName)
         }
     }
 
     /**
-     * Closes (dismisses) [currentBottomSheetFragment] if open.
-     * [currentBottomSheetFragment] will be null after this.
+     * Closes (dismisses) [BaseSingleBottomSheetFragment] if open.
      */
-    @SuppressWarnings("WeakerAccess")
     fun closeCurrentlyOpenBottomSheet() {
-        dismissDialog(currentBottomSheetFragment)
-        currentBottomSheetFragment = null
+        dismissDialog(getCurrentBottomSheetFragment())
     }
 
     /**
-     * Closes (dismisses) [currentDialogFragment] if open.
-     * [currentDialogFragment] will be null after this.
+     * Closes (dismisses) [BaseSingleDialogFragment] if open.
      */
-    @SuppressWarnings("WeakerAccess")
     fun closeCurrentlyOpenDialog() {
-        dismissDialog(currentDialogFragment)
-        currentDialogFragment = null
+        dismissDialog(getCurrentDialogFragment())
     }
 
     // use onCreate to keep track of back stack changed listener
@@ -219,21 +218,27 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         }
     }
 
-    // backpress handling
+    // back press handling
     override fun onBackPressed() {
-        if (currentFragment?.overridesBackPress == true) {
+        if (getCurrentFragment()?.overridesBackPress == true) {
             return
         }
         super.onBackPressed()
     }
 
-    // logic to dismiss a dialog fragment
-    private fun dismissDialog(dialogFragment: AppCompatDialogFragment?) {
-        dialogFragment?.let {
-            if (it.isResumed) {
-                it.dismissAllowingStateLoss()
-            }
-        }
+    // handle storing reusable data to saved instance state
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putSerializable(ARG_CUSTOM_ANIMATIONS, customAnimationSettings)
+        outState.putBoolean(ARG_CLOSE_DIALOGS_WHILE_NAV, closeDialogsAndSheetsWhileNavigating)
+    }
+
+    // handle retrieving reusable data from saved instance state
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        customAnimationSettings = (savedInstanceState.getSerializable(ARG_CUSTOM_ANIMATIONS)
+                ?: CustomAnimationSettings()) as CustomAnimationSettings
+        closeDialogsAndSheetsWhileNavigating = savedInstanceState.getBoolean(ARG_CLOSE_DIALOGS_WHILE_NAV, true)
     }
 
     // logic to commit transaction
@@ -242,7 +247,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         // if fragment will be added to back stack, it need to get in front of the fragment replacing
         // it in order for animations to play nicely
         if (addToBackStack) {
-            fragment.translationZ = supportFragmentManager.backStackEntryCount + 1f
+            fragment.addTranslationZToBundle(supportFragmentManager.backStackEntryCount + 1f)
         }
 
         // setup transaction
@@ -285,6 +290,24 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         }
     }
 
+    // Represents currently opened dialog fragment, or null if not opened
+    private fun getCurrentDialogFragment(): BaseSingleDialogFragment? =
+            supportFragmentManager.fragments.filterIsInstance<BaseSingleDialogFragment>().lastOrNull()
+
+    // Represents currently opened bottom sheet fragment, or null if not opened
+    private fun getCurrentBottomSheetFragment(): BaseSingleBottomSheetFragment? =
+            supportFragmentManager.fragments.filterIsInstance<BaseSingleBottomSheetFragment>().lastOrNull()
+
+    // logic to dismiss a dialog fragment
+    private fun dismissDialog(dialogFragment: AppCompatDialogFragment?) {
+        dialogFragment?.let {
+            if (it.isResumed) {
+                it.dismissAllowingStateLoss()
+            }
+        }
+    }
+
+    // close all dialogs and bottom sheets, but check for closeDialogsAndSheetsWhileNavigating
     private fun handleCloseAllDialogsAndSheets() {
         if (closeDialogsAndSheetsWhileNavigating) {
             closeCurrentlyOpenBottomSheet()

@@ -1,6 +1,7 @@
 package com.vojtkovszky.singleactivitynavigation
 
 import androidx.annotation.AnimRes
+import java.io.Serializable
 
 /**
  * Global custom animation settings.
@@ -11,7 +12,7 @@ import androidx.annotation.AnimRes
  * but in general consistent use of transitions could be achieved by defining it here only.
  */
 @Suppress("unused")
-class CustomAnimationSettings {
+class CustomAnimationSettings : Serializable {
     @AnimRes var animationRootEnter = 0
     @AnimRes var animationRootExit = 0
     @AnimRes var animationRootPopEnter = 0

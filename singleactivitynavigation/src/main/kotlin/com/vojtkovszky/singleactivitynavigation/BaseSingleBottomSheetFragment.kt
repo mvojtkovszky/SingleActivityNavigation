@@ -11,20 +11,29 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 /**
  * A bottom sheet fragment acting as a container for our [BaseSingleFragment], created when
  * [BaseSingleActivity.openBottomSheet] is called.
+ *
+ * Only to be used internally as [BaseSingleActivity] will always know how to handle
+ * child fragments by itself.
  */
 internal class BaseSingleBottomSheetFragment: BottomSheetDialogFragment() {
 
     // fragment is to be set before dialog is created.
     // It will be attached to dialog's base view when the dialog is created.
-    lateinit var fragment: BaseSingleFragment
+    // Don't rely on this instance as it will be lost when/if underlying activity is recreated.
+    // To retrieve fragment once attached, use getInnerFragment() instead
+    internal lateinit var fragment: BaseSingleFragment
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return FrameLayout(requireActivity()).apply {
             id = R.id.bottomSheetFragment
-            childFragmentManager
-                .beginTransaction()
-                .replace(R.id.bottomSheetFragment, fragment, fragment::class.simpleName)
-                .commitAllowingStateLoss()
+            // fragment transaction is not needed if restoring from instance state as fragment
+            // will be recreated in container.
+            if (savedInstanceState == null && ::fragment.isInitialized) {
+                childFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.bottomSheetFragment, fragment, fragment::class.simpleName)
+                        .commitAllowingStateLoss()
+            }
         }
     }
 
@@ -45,5 +54,12 @@ internal class BaseSingleBottomSheetFragment: BottomSheetDialogFragment() {
             "Fragment needs to be set before calling show"
         }
         super.show(manager, tag)
+    }
+
+    /**
+     * Returns current child fragment attached to this fragment
+     */
+    internal fun getInnerFragment(): BaseSingleFragment? {
+        return childFragmentManager.fragments.filterIsInstance<BaseSingleFragment>().lastOrNull()
     }
 }

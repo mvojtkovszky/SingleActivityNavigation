@@ -11,5 +11,6 @@
     <string name="type_dialog">Dialog</string>
     <string name="back_to_root">Back To Root</string>
     <string name="open_type_fragment">Open %s Fragment</string>
-    <string name="this_is_type_fragment">This is %s Fragment</string>
+    <string name="this_is_type_fragment">This is a %s Fragment</string>
+    <string name="stack_size_is">Stack size: %d</string>
 </resources>
