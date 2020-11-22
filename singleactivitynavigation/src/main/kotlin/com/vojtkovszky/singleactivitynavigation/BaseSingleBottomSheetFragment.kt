@@ -53,11 +53,15 @@ internal class BaseSingleBottomSheetFragment: BottomSheetDialogFragment() {
         require(::fragment.isInitialized) {
             "Fragment needs to be set before calling show"
         }
-        super.show(manager, tag)
+
+        // only show if we can guarantee we won't get into IllegalStateException due to state loss commit
+        if (!manager.isDestroyed && !manager.isStateSaved) {
+            super.show(manager, tag)
+        }
     }
 
     /**
-     * Returns current child fragment attached to this fragment
+     * Returns current child [BaseSingleFragment] attached to this fragment
      */
     internal fun getInnerFragment(): BaseSingleFragment? {
         return childFragmentManager.fragments.filterIsInstance<BaseSingleFragment>().lastOrNull()
