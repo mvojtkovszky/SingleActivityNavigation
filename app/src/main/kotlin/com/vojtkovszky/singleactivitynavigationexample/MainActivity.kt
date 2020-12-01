@@ -38,8 +38,7 @@ class MainActivity : BaseSingleActivity() {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
-
-        setContentView(R.layout.activity_main)
+        setContentView(binding.root)
 
         // we'll be switching main fragments with out bottom navigation
         binding.navigationView.setOnNavigationItemSelectedListener {

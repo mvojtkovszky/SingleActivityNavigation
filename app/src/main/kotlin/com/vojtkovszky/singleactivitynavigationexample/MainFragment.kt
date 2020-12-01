@@ -14,7 +14,7 @@ class MainFragment : BaseSingleFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentMainBinding.inflate(inflater, container, false)
-        return inflater.inflate(R.layout.fragment_main, container, false)
+        return binding.root
     }
 
     override fun onResume() {
