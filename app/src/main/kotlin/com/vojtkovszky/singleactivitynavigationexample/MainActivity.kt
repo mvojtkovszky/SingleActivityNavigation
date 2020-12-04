@@ -4,8 +4,7 @@ import android.os.Bundle
 import android.view.View
 import com.vojtkovszky.singleactivitynavigation.BaseSingleActivity
 import com.vojtkovszky.singleactivitynavigation.BaseSingleFragment
-import com.vojtkovszky.singleactivitynavigation.FragmentType
-import kotlinx.android.synthetic.main.activity_main.*
+import com.vojtkovszky.singleactivitynavigationexample.databinding.ActivityMainBinding
 
 class MainActivity : BaseSingleActivity() {
 
@@ -23,6 +22,8 @@ class MainActivity : BaseSingleActivity() {
 
     private var selectedTabIndex = ROOT_FRAGMENT_POS_HOME
 
+    private lateinit var binding: ActivityMainBinding
+
     // define main fragments based on position
     override fun getNewRootFragmentInstance(positionIndex: Int): BaseSingleFragment? {
         return when (positionIndex) {
@@ -35,10 +36,12 @@ class MainActivity : BaseSingleActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         // we'll be switching main fragments with out bottom navigation
-        navigationView.setOnNavigationItemSelectedListener {
+        binding.navigationView.setOnNavigationItemSelectedListener {
             selectedTabIndex = when (it.itemId) {
                 R.id.navigation_home -> ROOT_FRAGMENT_POS_HOME
                 R.id.navigation_dashboard -> ROOT_FRAGMENT_POS_DASHBOARD
@@ -89,6 +92,6 @@ class MainActivity : BaseSingleActivity() {
 
     private fun handleNavigationViewVisibility(backStackCount: Int) {
         // only make bottom bar visible if we're on root screen
-        navigationView.visibility = if (backStackCount == 0) View.VISIBLE else View.GONE
+        binding.navigationView.visibility = if (backStackCount == 0) View.VISIBLE else View.GONE
     }
 }

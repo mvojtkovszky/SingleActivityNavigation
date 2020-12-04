@@ -17,47 +17,42 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
  */
 internal class BaseSingleBottomSheetFragment: BottomSheetDialogFragment() {
 
-    // fragment is to be set before dialog is created.
-    // It will be attached to dialog's base view when the dialog is created.
-    // Don't rely on this instance as it will be lost when/if underlying activity is recreated.
-    // To retrieve fragment once attached, use getInnerFragment() instead
-    internal lateinit var fragment: BaseSingleFragment
+    // Fragment is to be set before dialog is created and will be attached to dialog's
+    // base view when the dialog is created. The reference will be removed immediately after.
+    internal var fragment: BaseSingleFragment? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FrameLayout(requireActivity()).apply {
             id = R.id.bottomSheetFragment
-            // fragment transaction is not needed if restoring from instance state as fragment
+            // Fragment transaction is not needed if restoring from instance state as fragment
             // will be recreated in container.
-            if (savedInstanceState == null && ::fragment.isInitialized) {
+            if (savedInstanceState == null && fragment != null) {
                 childFragmentManager
                         .beginTransaction()
-                        .replace(R.id.bottomSheetFragment, fragment, fragment::class.simpleName)
+                        .replace(R.id.bottomSheetFragment, fragment!!, fragment!!::class.simpleName)
+                        .runOnCommit {
+                            // At this point fragment reference is not needed anymore and it's
+                            // important we remove it to avoid memory leaks.
+                            fragment = null
+                        }
                         .commitAllowingStateLoss()
             }
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        // remove fragment from view when dialog's view is getting destroyed
-        if (::fragment.isInitialized) {
-            childFragmentManager
-                    .beginTransaction()
-                    .remove(fragment)
-                    .commitAllowingStateLoss()
-        }
-    }
-
     override fun show(manager: FragmentManager, tag: String?) {
-        require(::fragment.isInitialized) {
+        require(fragment != null) {
             "Fragment needs to be set before calling show"
         }
-        super.show(manager, tag)
+
+        // only show if we can guarantee we won't get into IllegalStateException due to state loss commit
+        if (!manager.isDestroyed && !manager.isStateSaved) {
+            super.show(manager, tag)
+        }
     }
 
     /**
-     * Returns current child fragment attached to this fragment
+     * Returns current child [BaseSingleFragment] attached to this fragment
      */
     internal fun getInnerFragment(): BaseSingleFragment? {
         return childFragmentManager.fragments.filterIsInstance<BaseSingleFragment>().lastOrNull()

@@ -6,12 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import com.vojtkovszky.singleactivitynavigation.BaseSingleFragment
 import com.vojtkovszky.singleactivitynavigation.FragmentType
-import kotlinx.android.synthetic.main.fragment_main.*
+import com.vojtkovszky.singleactivitynavigationexample.databinding.FragmentMainBinding
 
 class MainFragment : BaseSingleFragment() {
 
+    private var _binding: FragmentMainBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_main, container, false)
+        _binding = FragmentMainBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onResume() {
@@ -28,8 +32,8 @@ class MainFragment : BaseSingleFragment() {
         })
 
         // use it to set status text
-        textStatus.text = getString(R.string.this_is_type_fragment, title)
-        textStackSize.text = getString(R.string.stack_size_is,
+        binding.textStatus.text = getString(R.string.this_is_type_fragment, title)
+        binding.textStackSize.text = getString(R.string.stack_size_is,
                 activity?.supportFragmentManager?.backStackEntryCount ?: -1)
         // and change title, but not needed in dialog
         if (!fragmentType.isDialogOrBottomSheet()) {
@@ -37,25 +41,30 @@ class MainFragment : BaseSingleFragment() {
         }
 
         // click listeners on buttons
-        buttonOpenRegular.let {
+        binding.buttonOpenRegular.let {
             it.text = getString(R.string.open_type_fragment, getString(R.string.type_regular))
             it.setOnClickListener { navigateTo(MainFragment()) }
         }
-        buttonOpenModal.let {
+        binding.buttonOpenModal.let {
             it.text = getString(R.string.open_type_fragment, getString(R.string.type_modal))
             it.setOnClickListener { navigateTo(MainFragment(), openAsModal = true) }
         }
-        buttonOpenBottomSheet.let {
+        binding.buttonOpenBottomSheet.let {
             it.text = getString(R.string.open_type_fragment, getString(R.string.type_bottom_sheet))
             it.setOnClickListener { openBottomSheet(MainFragment()) }
         }
-        buttonOpenDialog.let {
+        binding.buttonOpenDialog.let {
             it.text = getString(R.string.open_type_fragment, getString(R.string.type_dialog))
             it.setOnClickListener { openDialog(MainFragment())}
         }
-        buttonBackToRoot.let {
+        binding.buttonBackToRoot.let {
             it.text = getString(R.string.back_to_root)
             it.setOnClickListener { navigateBackToRoot() }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
