@@ -168,8 +168,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     fun openBottomSheet(fragment: BaseSingleFragment) {
         closeCurrentlyOpenBottomSheet()
         with(BaseSingleBottomSheetFragment()) {
-            this.fragment = fragment
-            this.fragment.addFragmentTypeToBundle(FragmentType.BOTTOM_SHEET)
+            this.fragment = fragment.also { it.addFragmentTypeToBundle(FragmentType.BOTTOM_SHEET) }
             this.show(supportFragmentManager, fragment::class.simpleName)
         }
     }
@@ -190,8 +189,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         closeCurrentlyOpenDialog()
         with(BaseSingleDialogFragment.newInstance(anchorView, useFullWidth)) {
             setStyle(dialogStyle, dialogTheme)
-            this.fragment = fragment
-            this.fragment.addFragmentTypeToBundle(FragmentType.DIALOG)
+            this.fragment = fragment.also { it.addFragmentTypeToBundle(FragmentType.DIALOG) }
             this.show(supportFragmentManager, fragment::class.simpleName)
         }
     }
