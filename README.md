@@ -45,6 +45,7 @@ getCurrentFragment()?.let {
 <br/>Let the fragment define behavioural patterns of it's own by overriding open properties:
 ``` kotlin
 open val isModal: Boolean
+open val mustBeValidToInvokeNavigation: Boolean
 open val overridesBackPress: Boolean
 open val animationEnter: Int
 open val animationExit: Int
