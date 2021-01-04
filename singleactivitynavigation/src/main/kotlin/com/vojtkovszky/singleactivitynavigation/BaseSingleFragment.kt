@@ -35,6 +35,15 @@ abstract class BaseSingleFragment: Fragment() {
         get() = fragmentType == FragmentType.MODAL
 
     /**
+     * If set to true, any navigation call from this fragment will check for fragment validity
+     * first; meaning fragment has to be added, its activity not null, not destroyed, not finishing.
+     * This ensures navigation methods are never invoked outside of fragment lifecycle.
+     * false is default.
+     */
+    open val mustBeValidToInvokeNavigation: Boolean
+        get() = false
+
+    /**
      * If set to true, [BaseSingleActivity]'s onBackPressed method will be prevented from invoking.
      */
     open val overridesBackPress: Boolean
@@ -82,28 +91,36 @@ abstract class BaseSingleFragment: Fragment() {
      * Shortcut to [BaseSingleActivity.navigateBackTo]
      */
     fun navigateBackTo(fragmentName: String) {
-        baseSingleActivity?.navigateBackTo(fragmentName)
+        if (canProceedWithNavigation()) {
+            baseSingleActivity?.navigateBackTo(fragmentName)
+        }
     }
 
     /**
      * Shortcut to [BaseSingleActivity.navigateBack]
      */
     fun navigateBack() {
-        baseSingleActivity?.navigateBack()
+        if (canProceedWithNavigation()) {
+            baseSingleActivity?.navigateBack()
+        }
     }
 
     /**
      * Shortcut to [BaseSingleActivity.navigateBackToRoot]
      */
     fun navigateBackToRoot() {
-        baseSingleActivity?.navigateBackToRoot()
+        if (canProceedWithNavigation()) {
+            baseSingleActivity?.navigateBackToRoot()
+        }
     }
 
     /**
      * Shortcut to [BaseSingleActivity.selectRootFragment]
      */
     fun selectRootFragment(positionIndex: Int = 0, popStack: Boolean = true) {
-        baseSingleActivity?.selectRootFragment(positionIndex, popStack)
+        if (canProceedWithNavigation()) {
+            baseSingleActivity?.selectRootFragment(positionIndex, popStack)
+        }
     }
 
     /**
@@ -111,14 +128,18 @@ abstract class BaseSingleFragment: Fragment() {
      */
     fun navigateTo(fragment: BaseSingleFragment, openAsModal: Boolean = false,
                    ignoreIfAlreadyInStack: Boolean = false) {
-        baseSingleActivity?.navigateTo(fragment, openAsModal, ignoreIfAlreadyInStack)
+        if (canProceedWithNavigation()) {
+            baseSingleActivity?.navigateTo(fragment, openAsModal, ignoreIfAlreadyInStack)
+        }
     }
 
     /**
      * Shortcut to [BaseSingleActivity.openBottomSheet]
      */
     fun openBottomSheet(fragment: BaseSingleFragment) {
-        baseSingleActivity?.openBottomSheet(fragment)
+        if (canProceedWithNavigation()) {
+            baseSingleActivity?.openBottomSheet(fragment)
+        }
     }
 
     /**
@@ -126,21 +147,27 @@ abstract class BaseSingleFragment: Fragment() {
      */
     fun openDialog(fragment: BaseSingleFragment, anchorView: View? = null, useFullWidth: Boolean = true,
                    dialogStyle: Int = DialogFragment.STYLE_NORMAL, dialogTheme: Int = 0) {
-        baseSingleActivity?.openDialog(fragment, anchorView, useFullWidth, dialogStyle, dialogTheme)
+        if (canProceedWithNavigation()) {
+            baseSingleActivity?.openDialog(fragment, anchorView, useFullWidth, dialogStyle, dialogTheme)
+        }
     }
 
     /**
      * Shortcut to [BaseSingleActivity.closeCurrentlyOpenBottomSheet]
      */
     fun closeCurrentlyOpenBottomSheet() {
-        baseSingleActivity?.closeCurrentlyOpenBottomSheet()
+        if (canProceedWithNavigation()) {
+            baseSingleActivity?.closeCurrentlyOpenBottomSheet()
+        }
     }
 
     /**
      * Shortcut to [BaseSingleActivity.closeCurrentlyOpenDialog]
      */
     fun closeCurrentlyOpenDialog() {
-        baseSingleActivity?.closeCurrentlyOpenDialog()
+        if (canProceedWithNavigation()) {
+            baseSingleActivity?.closeCurrentlyOpenDialog()
+        }
     }
     // endregion shortcuts to baseSingleActivity methods
 
@@ -164,6 +191,17 @@ abstract class BaseSingleFragment: Fragment() {
         }
     }
     // endregion add bundle
+
+    // region private methods
+    private fun canProceedWithNavigation(): Boolean {
+        return if (mustBeValidToInvokeNavigation) isValid() else true
+    }
+
+    private fun isValid(): Boolean {
+        return baseSingleActivity != null && !baseSingleActivity!!.isDestroyed &&
+                !baseSingleActivity!!.isFinishing && isAdded
+    }
+    // endregion private methods
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         ViewCompat.setTranslationZ(view, translationZ)
