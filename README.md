@@ -1,5 +1,5 @@
 # SingleActivityNavigation
-A single activity application framework with straightforward navigation controls, allowing free 
+A single activity application framework with straightforward navigation controls, allowing seamless
 movement between fragments through different containers using a single line of code.
 <br/><br/>
 <img src="example.gif" alt="Example Flow" width="320"/>
@@ -12,32 +12,31 @@ Then you can simply move between fragments from either activity or fragment.
 // take any fragment(s) of your choosing
 val myFragment = MyFragment()
 
-// simply navigate to it
-navigateTo(myFragment)
-
-// ... or open it in bottom sheet
-openBottomSheet(myFragment)
-
-// ... or in a dialog
-openDialog(myFragment)
-
 // multiple ways to navigate through back stack
+// notice how we can use same fragment and seamlessly put into any container
 navigateBack()
-navigateBackToRoot()
 navigateBackTo("fragment name")
-closeCurrentlyOpenBottomSheet()
-closeCurrentlyOpenDialog()
+navigateBackToRoot()
+navigateTo(myFragment)
+navigateToRoot(myFragment)
+navigateToBottomSheed(myFragment)
+navigateToDialog(myFragment)
 ```
 
 <br/>Make use of many convenience methods to help you control the state of your app
 ``` kotlin
 getCurrentFragment()?.let {
     when (it.fragmentType) {
-        FragmentType.ROOT -> TODO()
-        FragmentType.DEFAULT -> TODO()
-        FragmentType.MODAL -> TODO()
-        FragmentType.DIALOG -> TODO()
+        FragmentType.ROOT ->
+            // this fragment is root, came into existence with navigateToRoot() call
+        FragmentType.DEFAULT ->
+            // this fragment is default, came into existence with navigateTo() call, no special flags
+        FragmentType.MODAL ->
+            // this fragment is also default, but was flagged as modal during navigateTo() call
+        FragmentType.DIALOG ->
+            // this fragment is a dialog, came into existence with navigateToDialog() call
         FragmentType.BOTTOM_SHEET -> TODO()
+            // this fragment is a dialog, came into existence with navigateToBottomSheet() call
     }
 }
 ```

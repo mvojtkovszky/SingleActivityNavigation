@@ -54,11 +54,11 @@ class MainFragment : BaseSingleFragment() {
         }
         binding.buttonOpenBottomSheet.let {
             it.text = getString(R.string.open_type_fragment, getString(R.string.type_bottom_sheet))
-            it.setOnClickListener { openBottomSheet(MainFragment()) }
+            it.setOnClickListener { navigateToBottomSheet(MainFragment()) }
         }
         binding.buttonOpenDialog.let {
             it.text = getString(R.string.open_type_fragment, getString(R.string.type_dialog))
-            it.setOnClickListener { openDialog(MainFragment())}
+            it.setOnClickListener { navigateToDialog(MainFragment())}
         }
         binding.buttonBackToRoot.let {
             it.text = getString(R.string.back_to_root)

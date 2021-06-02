@@ -90,7 +90,15 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     }
 
     /**
+     * Navigate one step back.
+     */
+    fun navigateBack() {
+        onBackPressed()
+    }
+
+    /**
      * pop until the fragment with given [fragmentName] is found, or all the way back to root
+     * if no match found
      */
     fun navigateBackTo(fragmentName: String) {
         handleCloseAllDialogsAndSheets()
@@ -105,14 +113,8 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     }
 
     /**
-     * Navigate one step back.
-     */
-    fun navigateBack() {
-        onBackPressed()
-    }
-
-    /**
-     * Pop stack all the way back to root fragment
+     * Pop stack all the way back to root fragment.
+     * Root fragment is the fragment used when called [navigateToRoot]
      */
     fun navigateBackToRoot() {
         navigateBackTo("")

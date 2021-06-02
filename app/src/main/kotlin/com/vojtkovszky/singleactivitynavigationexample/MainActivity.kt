@@ -17,21 +17,14 @@ class MainActivity : BaseSingleActivity() {
         private const val ARG_SELECTED_TAB_INDEX = "MainActivity.ARG_SELECTED_TAB_INDEX"
     }
 
-    // define containers where fragments will be held
-    override val defaultFragmentContainerId: Int = R.id.fragmentContainer
-
     private var selectedTabIndex = ROOT_FRAGMENT_POS_HOME
+    private var rootFragments = MutableList<BaseSingleFragment?>(3) { null }
 
     private lateinit var binding: ActivityMainBinding
 
     // define main fragments based on position
-    override fun getNewRootFragmentInstance(positionIndex: Int): BaseSingleFragment? {
-        return when (positionIndex) {
-            // we'll use same fragment for all root positions
-            ROOT_FRAGMENT_POS_HOME, ROOT_FRAGMENT_POS_DASHBOARD, ROOT_FRAGMENT_POS_NOTIFICATIONS ->
-                MainFragment()
-            else -> null
-        }
+    override fun getDefaultFragmentContainerId(): Int {
+        return R.id.fragmentContainer
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +41,9 @@ class MainActivity : BaseSingleActivity() {
                 R.id.navigation_notifications -> ROOT_FRAGMENT_POS_NOTIFICATIONS
                 else -> return@setOnNavigationItemSelectedListener false
             }
-            selectRootFragment(selectedTabIndex)
+
+            selectTab(selectedTabIndex)
+
             return@setOnNavigationItemSelectedListener true
         }
 
@@ -67,11 +62,19 @@ class MainActivity : BaseSingleActivity() {
             closeDialogsAndSheetsWhileNavigating = true
 
             // select fragment
-            selectRootFragment(selectedTabIndex)
+            selectTab(selectedTabIndex)
         }
         // just restore bottom bar visibility
         else {
             handleNavigationViewVisibility(supportFragmentManager.backStackEntryCount)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        for (i in 0..rootFragments.lastIndex) {
+            rootFragments[i] = null
         }
     }
 
@@ -93,5 +96,21 @@ class MainActivity : BaseSingleActivity() {
     private fun handleNavigationViewVisibility(backStackCount: Int) {
         // only make bottom bar visible if we're on root screen
         binding.navigationView.visibility = if (backStackCount == 0) View.VISIBLE else View.GONE
+    }
+
+    private fun selectTab(index: Int) {
+        // setup if not set
+        if (rootFragments[index] == null) {
+            rootFragments[index] = when (index) {
+                ROOT_FRAGMENT_POS_HOME -> MainFragment()
+                ROOT_FRAGMENT_POS_DASHBOARD -> MainFragment()
+                ROOT_FRAGMENT_POS_NOTIFICATIONS -> MainFragment()
+                else -> null
+            }
+        }
+        // select
+        rootFragments[index]?.let {
+            navigateToRoot(it)
+        }
     }
 }
