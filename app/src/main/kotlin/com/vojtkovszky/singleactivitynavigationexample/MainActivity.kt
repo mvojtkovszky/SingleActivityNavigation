@@ -33,7 +33,7 @@ class MainActivity : BaseSingleActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // we'll be switching main fragments with out bottom navigation
+        // we'll be switching main fragments with bottom navigation
         binding.navigationView.setOnNavigationItemSelectedListener {
             selectedTabIndex = when (it.itemId) {
                 R.id.navigation_home -> ROOT_FRAGMENT_POS_HOME
@@ -42,7 +42,7 @@ class MainActivity : BaseSingleActivity() {
                 else -> return@setOnNavigationItemSelectedListener false
             }
 
-            selectTab(selectedTabIndex)
+            selectBottomTab(selectedTabIndex)
 
             return@setOnNavigationItemSelectedListener true
         }
@@ -62,7 +62,7 @@ class MainActivity : BaseSingleActivity() {
             closeDialogsAndSheetsWhileNavigating = true
 
             // select fragment
-            selectTab(selectedTabIndex)
+            selectBottomTab(selectedTabIndex)
         }
         // just restore bottom bar visibility
         else {
@@ -98,9 +98,10 @@ class MainActivity : BaseSingleActivity() {
         binding.navigationView.visibility = if (backStackCount == 0) View.VISIBLE else View.GONE
     }
 
-    private fun selectTab(index: Int) {
+    private fun selectBottomTab(index: Int) {
         // setup if not set
         if (rootFragments[index] == null) {
+            // let's just use same fragment in all tabs
             rootFragments[index] = when (index) {
                 ROOT_FRAGMENT_POS_HOME -> MainFragment()
                 ROOT_FRAGMENT_POS_DASHBOARD -> MainFragment()

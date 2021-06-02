@@ -63,16 +63,18 @@ abstract class BaseSingleActivity: AppCompatActivity() {
 
     // region Public methods
     /**
-     * Closes (dismisses) [BaseSingleBottomSheetFragment] if open.
+     * Dismisses [BaseSingleBottomSheetFragment] if showing
+     * (initialized by calling [navigateToBottomSheet]).
      */
-    fun closeCurrentlyOpenBottomSheet() {
+    fun dismissOpenBottomSheet() {
         dismissDialog(getCurrentBottomSheetFragment())
     }
 
     /**
-     * Closes (dismisses) [BaseSingleDialogFragment] if open.
+     * Dismisses [BaseSingleDialogFragment] if showing
+     * (initialized by calling [navigateToDialog]).
      */
-    fun closeCurrentlyOpenDialog() {
+    fun dismissOpenDialog() {
         dismissDialog(getCurrentDialogFragment())
     }
 
@@ -173,7 +175,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
      * Open a given [fragment] in a bottom sheet
      */
     fun navigateToBottomSheet(fragment: BaseSingleFragment) {
-        closeCurrentlyOpenBottomSheet()
+        dismissOpenBottomSheet()
         with(BaseSingleBottomSheetFragment()) {
             this.fragment = fragment.also { it.addFragmentTypeToBundle(FragmentType.BOTTOM_SHEET) }
             this.show(supportFragmentManager, fragment::class.simpleName)
@@ -194,7 +196,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
                          useFullWidth: Boolean = true,
                          dialogStyle: Int = DialogFragment.STYLE_NORMAL,
                          dialogTheme: Int = 0) {
-        closeCurrentlyOpenDialog()
+        dismissOpenDialog()
         with(BaseSingleDialogFragment.newInstance(anchorView, useFullWidth)) {
             setStyle(dialogStyle, dialogTheme)
             this.fragment = fragment.also { it.addFragmentTypeToBundle(FragmentType.DIALOG) }
@@ -320,8 +322,8 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     // close all dialogs and bottom sheets, but check for closeDialogsAndSheetsWhileNavigating
     private fun handleCloseAllDialogsAndSheets() {
         if (closeDialogsAndSheetsWhileNavigating) {
-            closeCurrentlyOpenBottomSheet()
-            closeCurrentlyOpenDialog()
+            dismissOpenBottomSheet()
+            dismissOpenDialog()
         }
     }
     // endregion
