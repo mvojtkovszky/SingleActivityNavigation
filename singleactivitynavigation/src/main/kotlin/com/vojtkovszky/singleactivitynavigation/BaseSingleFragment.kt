@@ -88,20 +88,20 @@ abstract class BaseSingleFragment: Fragment() {
 
     // region shortcuts to baseSingleActivity methods
     /**
-     * Shortcut to [BaseSingleActivity.closeCurrentlyOpenBottomSheet]
+     * Shortcut to [BaseSingleActivity.dismissOpenBottomSheet]
      */
-    fun closeCurrentlyOpenBottomSheet() {
+    fun dismissOpenBottomSheet() {
         if (canProceedWithNavigation()) {
-            baseSingleActivity?.closeCurrentlyOpenBottomSheet()
+            baseSingleActivity?.dismissOpenBottomSheet()
         }
     }
 
     /**
-     * Shortcut to [BaseSingleActivity.closeCurrentlyOpenDialog]
+     * Shortcut to [BaseSingleActivity.dismissOpenDialog]
      */
-    fun closeCurrentlyOpenDialog() {
+    fun dismissOpenDialog() {
         if (canProceedWithNavigation()) {
-            baseSingleActivity?.closeCurrentlyOpenDialog()
+            baseSingleActivity?.dismissOpenDialog()
         }
     }
 
