@@ -88,6 +88,24 @@ abstract class BaseSingleFragment: Fragment() {
 
     // region shortcuts to baseSingleActivity methods
     /**
+     * Shortcut to [BaseSingleActivity.closeCurrentlyOpenBottomSheet]
+     */
+    fun closeCurrentlyOpenBottomSheet() {
+        if (canProceedWithNavigation()) {
+            baseSingleActivity?.closeCurrentlyOpenBottomSheet()
+        }
+    }
+
+    /**
+     * Shortcut to [BaseSingleActivity.closeCurrentlyOpenDialog]
+     */
+    fun closeCurrentlyOpenDialog() {
+        if (canProceedWithNavigation()) {
+            baseSingleActivity?.closeCurrentlyOpenDialog()
+        }
+    }
+
+    /**
      * Shortcut to [BaseSingleActivity.navigateBackTo]
      */
     fun navigateBackTo(fragmentName: String) {
@@ -115,15 +133,6 @@ abstract class BaseSingleFragment: Fragment() {
     }
 
     /**
-     * Shortcut to [BaseSingleActivity.selectRootFragment]
-     */
-    fun selectRootFragment(positionIndex: Int = 0, popStack: Boolean = true) {
-        if (canProceedWithNavigation()) {
-            baseSingleActivity?.selectRootFragment(positionIndex, popStack)
-        }
-    }
-
-    /**
      * Shortcut to [BaseSingleActivity.navigateTo]
      */
     fun navigateTo(fragment: BaseSingleFragment, openAsModal: Boolean = false,
@@ -134,39 +143,30 @@ abstract class BaseSingleFragment: Fragment() {
     }
 
     /**
-     * Shortcut to [BaseSingleActivity.openBottomSheet]
+     * Shortcut to [BaseSingleActivity.navigateToBottomSheet]
      */
-    fun openBottomSheet(fragment: BaseSingleFragment) {
+    fun navigateToBottomSheet(fragment: BaseSingleFragment) {
         if (canProceedWithNavigation()) {
-            baseSingleActivity?.openBottomSheet(fragment)
+            baseSingleActivity?.navigateToBottomSheet(fragment)
         }
     }
 
     /**
-     * Shortcut to [BaseSingleActivity.openDialog]
+     * Shortcut to [BaseSingleActivity.navigateToDialog]
      */
-    fun openDialog(fragment: BaseSingleFragment, anchorView: View? = null, useFullWidth: Boolean = true,
-                   dialogStyle: Int = DialogFragment.STYLE_NORMAL, dialogTheme: Int = 0) {
+    fun navigateToDialog(fragment: BaseSingleFragment, anchorView: View? = null, useFullWidth: Boolean = true,
+                         dialogStyle: Int = DialogFragment.STYLE_NORMAL, dialogTheme: Int = 0) {
         if (canProceedWithNavigation()) {
-            baseSingleActivity?.openDialog(fragment, anchorView, useFullWidth, dialogStyle, dialogTheme)
+            baseSingleActivity?.navigateToDialog(fragment, anchorView, useFullWidth, dialogStyle, dialogTheme)
         }
     }
 
     /**
-     * Shortcut to [BaseSingleActivity.closeCurrentlyOpenBottomSheet]
+     * Shortcut to [BaseSingleActivity.navigateToRoot]
      */
-    fun closeCurrentlyOpenBottomSheet() {
+    fun navigateToRoot(fragment: BaseSingleFragment, popStack: Boolean = true) {
         if (canProceedWithNavigation()) {
-            baseSingleActivity?.closeCurrentlyOpenBottomSheet()
-        }
-    }
-
-    /**
-     * Shortcut to [BaseSingleActivity.closeCurrentlyOpenDialog]
-     */
-    fun closeCurrentlyOpenDialog() {
-        if (canProceedWithNavigation()) {
-            baseSingleActivity?.closeCurrentlyOpenDialog()
+            baseSingleActivity?.navigateToRoot(fragment, popStack)
         }
     }
     // endregion shortcuts to baseSingleActivity methods
