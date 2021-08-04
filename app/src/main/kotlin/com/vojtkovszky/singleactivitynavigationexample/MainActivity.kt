@@ -34,17 +34,17 @@ class MainActivity : BaseSingleActivity() {
         setContentView(binding.root)
 
         // we'll be switching main fragments with bottom navigation
-        binding.navigationView.setOnNavigationItemSelectedListener {
+        binding.navigationView.setOnItemSelectedListener {
             selectedTabIndex = when (it.itemId) {
                 R.id.navigation_home -> ROOT_FRAGMENT_POS_HOME
                 R.id.navigation_dashboard -> ROOT_FRAGMENT_POS_DASHBOARD
                 R.id.navigation_notifications -> ROOT_FRAGMENT_POS_NOTIFICATIONS
-                else -> return@setOnNavigationItemSelectedListener false
+                else -> return@setOnItemSelectedListener false
             }
 
             selectBottomTab(selectedTabIndex)
 
-            return@setOnNavigationItemSelectedListener true
+            return@setOnItemSelectedListener true
         }
 
         // fresh start
