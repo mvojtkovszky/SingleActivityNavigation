@@ -109,7 +109,11 @@ abstract class BaseSingleActivity: AppCompatActivity() {
                 if (it.getBackStackEntryAt(i).name == fragmentName) {
                     return
                 }
-                it.popBackStack()
+
+                // popping back stack not allowed after onSaveInstanceState, will cause IllegalStateException
+                if (!it.isStateSaved) {
+                    it.popBackStack()
+                }
             }
         }
     }
@@ -224,7 +228,8 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         // https://issuetracker.google.com/issues/139738913
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q &&
             isTaskRoot &&
-            supportFragmentManager.primaryNavigationFragment?.childFragmentManager?.backStackEntryCount ?: 0 == 0 &&
+            (supportFragmentManager.primaryNavigationFragment?.childFragmentManager
+                ?.backStackEntryCount ?: 0) == 0 &&
             supportFragmentManager.backStackEntryCount == 0
         ) {
             finishAfterTransition()
@@ -313,7 +318,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     // logic to dismiss a dialog fragment
     private fun dismissDialog(dialogFragment: AppCompatDialogFragment?) {
         dialogFragment?.let {
-            if (it.isResumed) {
+            if (it.isResumed && !it.isStateSaved) {
                 it.dismissAllowingStateLoss()
             }
         }
