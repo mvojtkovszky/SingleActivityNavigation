@@ -7,6 +7,7 @@ import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.DialogFragment
+import com.vojtkovszky.singleactivitynavigation.util.serializable
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 abstract class BaseSingleActivity: AppCompatActivity() {
@@ -95,6 +96,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
      * Navigate one step back.
      */
     fun navigateBack() {
+        @Suppress("DEPRECATION")
         onBackPressed()
     }
 
@@ -219,6 +221,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     }
 
     // back press handling
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (getCurrentFragment()?.overridesBackPress == true) {
             return
@@ -236,6 +239,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
             return
         }
 
+        @Suppress("DEPRECATION")
         super.onBackPressed()
     }
 
@@ -249,8 +253,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     // handle retrieving reusable data from saved instance state
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        customAnimationSettings = (savedInstanceState.getSerializable(ARG_CUSTOM_ANIMATIONS)
-                ?: CustomAnimationSettings()) as CustomAnimationSettings
+        customAnimationSettings = savedInstanceState.serializable(ARG_CUSTOM_ANIMATIONS) ?: CustomAnimationSettings()
         closeDialogsAndSheetsWhileNavigating = savedInstanceState.getBoolean(ARG_CLOSE_DIALOGS_WHILE_NAV, true)
     }
     // endregion
