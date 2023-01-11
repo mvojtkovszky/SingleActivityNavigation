@@ -7,6 +7,7 @@ import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.DialogFragment
+import com.vojtkovszky.singleactivitynavigation.util.serializable
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 abstract class BaseSingleActivity: AppCompatActivity() {
@@ -95,6 +96,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
      * Navigate one step back.
      */
     fun navigateBack() {
+        @Suppress("DEPRECATION")
         onBackPressed()
     }
 
@@ -109,7 +111,11 @@ abstract class BaseSingleActivity: AppCompatActivity() {
                 if (it.getBackStackEntryAt(i).name == fragmentName) {
                     return
                 }
-                it.popBackStack()
+
+                // popping back stack not allowed after onSaveInstanceState, will cause IllegalStateException
+                if (!it.isStateSaved) {
+                    it.popBackStack()
+                }
             }
         }
     }
@@ -215,6 +221,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     }
 
     // back press handling
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (getCurrentFragment()?.overridesBackPress == true) {
             return
@@ -224,13 +231,15 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         // https://issuetracker.google.com/issues/139738913
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q &&
             isTaskRoot &&
-            supportFragmentManager.primaryNavigationFragment?.childFragmentManager?.backStackEntryCount ?: 0 == 0 &&
+            (supportFragmentManager.primaryNavigationFragment?.childFragmentManager
+                ?.backStackEntryCount ?: 0) == 0 &&
             supportFragmentManager.backStackEntryCount == 0
         ) {
             finishAfterTransition()
             return
         }
 
+        @Suppress("DEPRECATION")
         super.onBackPressed()
     }
 
@@ -244,8 +253,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     // handle retrieving reusable data from saved instance state
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        customAnimationSettings = (savedInstanceState.getSerializable(ARG_CUSTOM_ANIMATIONS)
-                ?: CustomAnimationSettings()) as CustomAnimationSettings
+        customAnimationSettings = savedInstanceState.serializable(ARG_CUSTOM_ANIMATIONS) ?: CustomAnimationSettings()
         closeDialogsAndSheetsWhileNavigating = savedInstanceState.getBoolean(ARG_CLOSE_DIALOGS_WHILE_NAV, true)
     }
     // endregion
@@ -313,7 +321,7 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     // logic to dismiss a dialog fragment
     private fun dismissDialog(dialogFragment: AppCompatDialogFragment?) {
         dialogFragment?.let {
-            if (it.isResumed) {
+            if (it.isResumed && !it.isStateSaved) {
                 it.dismissAllowingStateLoss()
             }
         }
