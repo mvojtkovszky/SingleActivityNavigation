@@ -1,6 +1,5 @@
 package com.vojtkovszky.singleactivitynavigation
 
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.IdRes
@@ -96,7 +95,6 @@ abstract class BaseSingleActivity: AppCompatActivity() {
      * Navigate one step back.
      */
     fun navigateBack() {
-        @Suppress("DEPRECATION")
         onBackPressed()
     }
 
@@ -218,29 +216,6 @@ abstract class BaseSingleActivity: AppCompatActivity() {
         supportFragmentManager.addOnBackStackChangedListener {
             onBackStackChanged(supportFragmentManager.backStackEntryCount)
         }
-    }
-
-    // back press handling
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        if (getCurrentFragment()?.overridesBackPress == true) {
-            return
-        }
-
-        // fix for bug in android 10 causing memory leak when about to exit
-        // https://issuetracker.google.com/issues/139738913
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q &&
-            isTaskRoot &&
-            (supportFragmentManager.primaryNavigationFragment?.childFragmentManager
-                ?.backStackEntryCount ?: 0) == 0 &&
-            supportFragmentManager.backStackEntryCount == 0
-        ) {
-            finishAfterTransition()
-            return
-        }
-
-        @Suppress("DEPRECATION")
-        super.onBackPressed()
     }
 
     // handle storing reusable data to saved instance state
