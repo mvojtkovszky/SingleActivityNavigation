@@ -1,7 +1,9 @@
 package com.vojtkovszky.singleactivitynavigation
 
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.AnimRes
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.DialogFragment
@@ -41,12 +43,6 @@ abstract class BaseSingleFragment: Fragment() {
      * false is default.
      */
     open val mustBeValidToInvokeNavigation: Boolean
-        get() = false
-
-    /**
-     * If set to true, [BaseSingleActivity]'s onBackPressed method will be prevented from invoking.
-     */
-    open val overridesBackPress: Boolean
         get() = false
 
     /**
@@ -213,5 +209,35 @@ abstract class BaseSingleFragment: Fragment() {
         fragmentType = FragmentType.values().firstOrNull {
             it.name == arguments?.getString(ARG_FRAGMENT_TYPE_NAME) } ?: FragmentType.INVALID
         translationZ = arguments?.getFloat(ARG_TRANSLATION_Z) ?: 0f
+
+        // handle back press
+        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                this@BaseSingleFragment.handleOnBackPressed(this)
+            }
+        })
+    }
+
+    /**
+     * This method is called on every back press. Override it if you want to handle back presses manually.
+     * @param callback from a back pressed dispatcher for this fragment
+     */
+    open fun handleOnBackPressed(callback: OnBackPressedCallback) {
+        // fix for bug in android 10 causing memory leak when about to exit
+        // https://issuetracker.google.com/issues/139738913
+        baseSingleActivity?.let {
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q &&
+                it.isTaskRoot &&
+                (it.supportFragmentManager.primaryNavigationFragment?.childFragmentManager
+                    ?.backStackEntryCount ?: 0) == 0 &&
+                it.supportFragmentManager.backStackEntryCount == 0
+            ) {
+                it.finishAfterTransition()
+                return@handleOnBackPressed
+            }
+        }
+
+        callback.isEnabled = false
+        activity?.onBackPressed()
     }
 }
