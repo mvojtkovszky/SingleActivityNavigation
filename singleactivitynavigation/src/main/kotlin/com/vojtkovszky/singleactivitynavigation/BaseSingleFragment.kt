@@ -237,7 +237,9 @@ abstract class BaseSingleFragment: Fragment() {
             }
         }
 
+        // disable dispatcher callback, perform default back press and enable it again
         callback.isEnabled = false
         activity?.onBackPressed()
+        callback.isEnabled = true
     }
 }
