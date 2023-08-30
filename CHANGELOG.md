@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 3.3.1 (TBD)
+## 3.3.1 (2023-08-30)
 * Fix default onBackPressed() won't trigger after `handleOnBackPressed` is overridden and handled once. Callback is now always re-enabled afterwards.
 
 ## 3.3.0 (2023-08-29)
