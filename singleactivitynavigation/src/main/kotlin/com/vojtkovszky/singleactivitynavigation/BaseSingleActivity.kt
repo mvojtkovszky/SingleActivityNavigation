@@ -65,17 +65,21 @@ abstract class BaseSingleActivity: AppCompatActivity() {
     /**
      * Dismisses [BaseSingleBottomSheetFragment] if showing
      * (initialized by calling [navigateToBottomSheet]).
+     *
+     * @return true if any opened bottom sheet was dismissed, false otherwise
      */
-    fun dismissOpenBottomSheet() {
-        dismissDialog(getCurrentBottomSheetFragment())
+    fun dismissOpenBottomSheet(): Boolean {
+        return dismissDialog(getCurrentBottomSheetFragment())
     }
 
     /**
      * Dismisses [BaseSingleDialogFragment] if showing
      * (initialized by calling [navigateToDialog]).
+     *
+     * @return true if any opened dialog was dismissed, false otherwise
      */
-    fun dismissOpenDialog() {
-        dismissDialog(getCurrentDialogFragment())
+    fun dismissOpenDialog(): Boolean {
+        return dismissDialog(getCurrentDialogFragment())
     }
 
     /**
@@ -93,9 +97,27 @@ abstract class BaseSingleActivity: AppCompatActivity() {
 
     /**
      * Navigate one step back.
+     * Step is performed in following order:
+     * 1. Close any open dialog or bottom sheets
+     * 2.
      */
     fun navigateBack() {
-        onBackPressed()
+        // dismiss any open dialogs
+        if (handleCloseAllDialogsAndSheets()) {
+            return
+        } else {
+            supportFragmentManager.let {
+                // if empty back stack, default to back
+                if (it.backStackEntryCount == 0) {
+                    onBackPressedDispatcher.onBackPressed()
+                } else { // try to pop stack
+                    // popping back stack not allowed after onSaveInstanceState, will cause IllegalStateException
+                    if (!it.isStateSaved) {
+                        it.popBackStack()
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -294,20 +316,24 @@ abstract class BaseSingleActivity: AppCompatActivity() {
             supportFragmentManager.fragments.filterIsInstance<BaseSingleBottomSheetFragment>().lastOrNull()
 
     // logic to dismiss a dialog fragment
-    private fun dismissDialog(dialogFragment: AppCompatDialogFragment?) {
+    private fun dismissDialog(dialogFragment: AppCompatDialogFragment?): Boolean {
         dialogFragment?.let {
             if (it.isResumed && !it.isStateSaved) {
                 it.dismissAllowingStateLoss()
+                return true
             }
         }
+        return false
     }
 
     // close all dialogs and bottom sheets, but check for closeDialogsAndSheetsWhileNavigating
-    private fun handleCloseAllDialogsAndSheets() {
+    private fun handleCloseAllDialogsAndSheets(): Boolean {
         if (closeDialogsAndSheetsWhileNavigating) {
-            dismissOpenBottomSheet()
-            dismissOpenDialog()
+            val openedBottomSheetDismissed =  dismissOpenBottomSheet()
+            val openedDialogDismissed = dismissOpenDialog()
+            return openedBottomSheetDismissed || openedDialogDismissed
         }
+        return false
     }
     // endregion
 }
