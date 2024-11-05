@@ -206,7 +206,7 @@ abstract class BaseSingleFragment: Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fragmentType = FragmentType.values().firstOrNull {
+        fragmentType = FragmentType.entries.firstOrNull {
             it.name == arguments?.getString(ARG_FRAGMENT_TYPE_NAME) } ?: FragmentType.INVALID
         translationZ = arguments?.getFloat(ARG_TRANSLATION_Z) ?: 0f
 
