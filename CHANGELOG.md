@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.4.2 (TBD)
+* 
+
 ## 3.4.1 (2024-11-05)
 * bump Kotlin to 2.0.20, Gradle plugin to 8.7.2
 * bump core-ktx to 1.15.0, appcompat to 1.7.0, material to 1.12.0
